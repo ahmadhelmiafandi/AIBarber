@@ -1,0 +1,88 @@
+<?php
+namespace App\Services\Auth;
+
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+
+class AuthService
+{
+    public function register(array $data): array
+    {
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'password' => $data['password'],
+            'role' => 'customer',
+            'status' => 'active',
+        ]);
+
+        $user->assignRole('customer');
+        event(new Registered($user));
+
+        return [
+            'token' => $user->createToken('api-token')->plainTextToken,
+            'user' => $this->formatUser($user),
+        ];
+    }
+
+    public function login(string $email, string $password): array
+    {
+        $user = User::where('email', $email)->first();
+
+        if (!$user || !Hash::check($password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Email atau password salah.'],
+            ]);
+        }
+
+        if ($user->status !== 'active') {
+            throw ValidationException::withMessages([
+                'email' => ['Akun tidak aktif.'],
+            ]);
+        }
+
+        return [
+            'token' => $user->createToken('api-token')->plainTextToken,
+            'user' => $this->formatUser($user),
+        ];
+    }
+
+    public function logout(User $user): void
+    {
+        $user->currentAccessToken()?->delete();
+    }
+
+    public function forgotPassword(string $email): string
+    {
+        return Password::sendResetLink(['email' => $email]);
+    }
+
+    public function resetPassword(array $data): string
+    {
+        return Password::reset($data, function (User $user, string $password) {
+            $user->forceFill([
+                'password' => Hash::make($password),
+                'remember_token' => Str::random(60),
+            ])->save();
+        });
+    }
+
+    public function formatUser(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'role' => $user->role,
+            'roles' => $user->getRoleNames(),
+            'status' => $user->status,
+            'email_verified_at' => $user->email_verified_at,
+        ];
+    }
+}

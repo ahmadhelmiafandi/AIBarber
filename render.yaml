@@ -1,0 +1,144 @@
+services:
+  - type: web
+    name: aibarber-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: APP_NAME
+        value: "AI Smart Barbershop"
+      - key: APP_ENV
+        value: staging
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: DEPLOYMENT_PROFILE
+        value: demo
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_SSLMODE
+        value: require
+      - key: REDIS_URL
+        sync: false
+      - key: CACHE_STORE
+        value: redis
+      - key: SESSION_DRIVER
+        value: redis
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: SANCTUM_STATEFUL_DOMAINS
+        sync: false
+      - key: SANCTUM_EXPIRATION
+        value: "43200"
+      - key: SANCTUM_TOKEN_PREFIX
+        value: "aib_stg_"
+      - key: BROADCAST_CONNECTION
+        value: reverb
+      - key: REVERB_APP_ID
+        value: aibarber-staging
+      - key: REVERB_APP_KEY
+        sync: false
+      - key: REVERB_APP_SECRET
+        sync: false
+      - key: REVERB_HOST
+        sync: false
+      - key: REVERB_PORT
+        value: "443"
+      - key: REVERB_SCHEME
+        value: https
+      - key: FILESYSTEM_DISK
+        value: s3
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        value: auto
+      - key: AWS_BUCKET
+        sync: false
+      - key: AWS_ENDPOINT
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: REPLICATE_API_TOKEN
+        sync: false
+      - key: CRON_SECRET_TOKEN
+        sync: false
+
+  - type: web
+    name: aibarber-reverb
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - fromService:
+          type: web
+          name: aibarber-api
+          envVarKey: APP_KEY
+      - fromService:
+          type: web
+          name: aibarber-api
+          envVarKey: DB_HOST
+      - fromService:
+          type: web
+          name: aibarber-api
+          envVarKey: DB_DATABASE
+      - fromService:
+          type: web
+          name: aibarber-api
+          envVarKey: DB_USERNAME
+      - fromService:
+          type: web
+          name: aibarber-api
+          envVarKey: DB_PASSWORD
+      - fromService:
+          type: web
+          name: aibarber-api
+          envVarKey: REDIS_URL
+      - fromService:
+          type: web
+          name: aibarber-api
+          envVarKey: REVERB_APP_KEY
+      - fromService:
+          type: web
+          name: aibarber-api
+          envVarKey: REVERB_APP_SECRET
+      - key: APP_ENV
+        value: staging
+      - key: APP_DEBUG
+        value: "false"
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_SSLMODE
+        value: require
+      - key: BROADCAST_CONNECTION
+        value: reverb
+      - key: REVERB_APP_ID
+        value: aibarber-staging
+    startCommand: "php artisan reverb:start --host=0.0.0.0 --port=8080"

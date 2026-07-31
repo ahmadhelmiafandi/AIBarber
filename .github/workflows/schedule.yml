@@ -1,0 +1,18 @@
+name: Staging Scheduled Cron Trigger
+
+on:
+  schedule:
+    # Trigger every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger-cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Staging Cleanup Endpoint
+        run: |
+          curl -X POST "${{ secrets.STAGING_API_URL }}/api/v1/cron/cleanup" \
+            -H "X-Cron-Token: ${{ secrets.CRON_SECRET_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error
