@@ -16,16 +16,12 @@ import {
   ArrowRight,
   Menu,
   CheckCircle2,
-  Zap,
-  ShieldCheck,
-  UserCheck,
-  Activity,
-  Layers,
 } from "lucide-react";
 
 const navLinks = [
   { label: "Fitur AI", href: "#features" },
   { label: "Cara Kerja", href: "#how-it-works" },
+  { label: "Portofolio", href: "#portfolio" },
   { label: "Statistik", href: "#stats" },
   { label: "Testimoni", href: "#testimonials" },
 ];
@@ -36,6 +32,69 @@ const timelineSteps = [
   { icon: Sparkles, label: "3. Rekomendasi", desc: "Dapatkan gaya rambut presisi tersesuaikan" },
   { icon: Eye, label: "4. Virtual Preview", desc: "Simulasikan tampilan rambut sebelum dipotong" },
   { icon: Calendar, label: "5. Smart Booking", desc: "Reservasi jadwal barber & amankan antrean" },
+];
+
+const portfolioItems = [
+  {
+    name: "Textured Crop Fade",
+    category: "Textured & Fade",
+    faceShapes: ["Oval", "Square", "Diamond"],
+    barber: "Fadli Barber - Cabang Sudirman",
+    rating: 4.9,
+    tag: "Trending",
+    bgGradient: "from-amber-500/20 via-primary/10 to-purple-500/20",
+    desc: "Potongan bertekstur pada bagian atas dengan gradasi mid fade yang memberikan kesan rapi dan maskulin.",
+  },
+  {
+    name: "Classic Side Part Undercut",
+    category: "Classic Side Part",
+    faceShapes: ["Round", "Oval", "Heart"],
+    barber: "Budi Barber - Cabang Kemang",
+    rating: 5.0,
+    tag: "Favorit Eksekutif",
+    bgGradient: "from-blue-500/20 via-indigo-500/10 to-primary/20",
+    desc: "Belahan samping bergaris tegas dipadukan dengan undercut halus untuk tampilan profesional nan elegan.",
+  },
+  {
+    name: "Taper Fade Pompadour",
+    category: "Textured & Fade",
+    faceShapes: ["Square", "Oval"],
+    barber: "Andi Master - Cabang PIK",
+    rating: 4.8,
+    tag: "High Volume",
+    bgGradient: "from-purple-500/20 via-pink-500/10 to-amber-500/20",
+    desc: "Gaya pompadour modern dengan puncak rambut bervolume tinggi dan taper fade bersih di bagian samping.",
+  },
+  {
+    name: "French Crop with Line-Up",
+    category: "Modern Crop",
+    faceShapes: ["Oval", "Diamond", "Square"],
+    barber: "Fadli Barber - Cabang Sudirman",
+    rating: 4.9,
+    tag: "Low Maintenance",
+    bgGradient: "from-emerald-500/20 via-teal-500/10 to-primary/20",
+    desc: "Poni lurus tegas dengan tekstur pendek di bagian atas. Sangat praktis untuk aktivitas harian padat.",
+  },
+  {
+    name: "Buzz Cut Taper",
+    category: "Buzz & Taper",
+    faceShapes: ["Oval", "Square"],
+    barber: "Budi Barber - Cabang Kemang",
+    rating: 4.9,
+    tag: "Clean & Sharp",
+    bgGradient: "from-orange-500/20 via-amber-500/10 to-rose-500/20",
+    desc: "Potongan sangat pendek yang dipadu dengan garis tepi presisi pisau cukur untuk kesan tajam dan sporty.",
+  },
+  {
+    name: "Slicked Back Low Fade",
+    category: "Classic Side Part",
+    faceShapes: ["Oval", "Heart", "Square"],
+    barber: "Andi Master - Cabang PIK",
+    rating: 5.0,
+    tag: "Premium Look",
+    bgGradient: "from-cyan-500/20 via-blue-500/10 to-primary/20",
+    desc: "Rambut disisir rapi ke belakang dengan pomade shine tinggi dan low drop fade melingkari telinga.",
+  },
 ];
 
 const features = [
@@ -154,11 +213,9 @@ function Navbar() {
 function Hero() {
   return (
     <section className="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
-      {/* Background Subtle Gradient Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-primary/10 via-amber-500/10 to-purple-500/10 blur-[120px] pointer-events-none -z-10" />
 
       <div className="max-w-[1200px] mx-auto px-6 text-center">
-        {/* Pill Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold tracking-wide mb-6">
           <Sparkles className="w-3.5 h-3.5 animate-pulse" />
           <span>Generasi Baru Smart Barbershop & AI Face Analysis</span>
@@ -187,9 +244,7 @@ function Hero() {
           </Link>
         </div>
 
-        {/* Dynamic Interactive Preview Showcase Card */}
         <div className="mt-14 max-w-[860px] mx-auto rounded-2xl border border-border bg-card shadow-2xl p-4 sm:p-6 text-left relative overflow-hidden">
-          {/* Mock Top Header */}
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-border/80">
             <div className="flex items-center gap-3">
               <div className="flex gap-1.5">
@@ -207,9 +262,7 @@ function Hero() {
             </div>
           </div>
 
-          {/* Mock Preview Content Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Left Box: Facial Analysis */}
             <div className="p-4 rounded-xl bg-muted/40 border border-border/60 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -241,7 +294,6 @@ function Hero() {
               </div>
             </div>
 
-            {/* Middle Box: Main Recommendation */}
             <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -265,7 +317,6 @@ function Hero() {
               </Link>
             </div>
 
-            {/* Right Box: Live Barber Status */}
             <div className="p-4 rounded-xl bg-muted/40 border border-border/60 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -275,7 +326,7 @@ function Hero() {
                 <div className="text-sm font-semibold text-foreground">Cabang Sudirman</div>
                 <div className="mt-2 space-y-1.5 text-xs text-muted-foreground">
                   <div className="flex justify-between">
-                    <span>Sedang Diberlayani:</span>
+                    <span>Sedang Dilayani:</span>
                     <span className="font-semibold text-foreground">Antrean #A-14</span>
                   </div>
                   <div className="flex justify-between">
@@ -338,6 +389,96 @@ function Timeline() {
               <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Portfolio() {
+  return (
+    <section id="portfolio" className="py-20 md:py-28 bg-muted/20 border-t border-border">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
+            <Scissors className="w-3.5 h-3.5" />
+            <span>Karya & Inspirasi Gaya Rambut</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+            Portofolio Model Rambut Terpopuler
+          </h2>
+          <p className="mt-3 text-muted-foreground max-w-[560px] mx-auto text-sm sm:text-base">
+            Koleksi potongan rambut terbaik hasil karya master barber kami yang terintegrasi dengan kecerdasan AI.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {portfolioItems.map((item, i) => (
+            <div
+              key={i}
+              className="group rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className={`h-48 relative p-6 bg-gradient-to-br ${item.bgGradient} flex flex-col justify-between overflow-hidden`}>
+                <div className="flex items-center justify-between relative z-10">
+                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-background/80 backdrop-blur-md text-foreground border border-border/60">
+                    {item.category}
+                  </span>
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 text-xs font-bold border border-amber-500/20">
+                    <Star className="w-3.5 h-3.5 fill-current" />
+                    <span>{item.rating}</span>
+                  </div>
+                </div>
+
+                <div className="relative z-10">
+                  <span className="text-xs font-mono tracking-wider text-primary uppercase font-bold">{item.tag}</span>
+                  <h3 className="text-xl font-extrabold text-foreground group-hover:text-primary transition-colors">
+                    {item.name}
+                  </h3>
+                </div>
+
+                <Scissors className="absolute -bottom-4 -right-4 w-32 h-32 text-foreground/5 group-hover:text-primary/10 transition-colors pointer-events-none" />
+              </div>
+
+              <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  {item.desc}
+                </p>
+
+                <div className="space-y-3 pt-3 border-t border-border/60">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Cocok Untuk Wajah:</span>
+                    <div className="flex gap-1.5 flex-wrap justify-end">
+                      {item.faceShapes.map((shape, idx) => (
+                        <span key={idx} className="px-2 py-0.5 rounded bg-muted text-foreground text-[10px] font-semibold border border-border">
+                          {shape}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <span className="text-muted-foreground font-medium">{item.barber}</span>
+                    <Link
+                      href="/dashboard/ai-consultant"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                    >
+                      Coba AI <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link
+            href="/dashboard/ai-consultant"
+            className="inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-md"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Analisis Gaya Yang Paling Cocok Dengan Wajahmu</span>
+          </Link>
         </div>
       </div>
     </section>
@@ -474,7 +615,7 @@ function Footer() {
             <span>MyBarber</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} AI Barbershop. All rights reserved.
+            &copy; {new Date().getFullYear()} MyBarber. All rights reserved.
           </p>
         </div>
       </div>
@@ -489,6 +630,7 @@ export default function Home() {
       <Hero />
       <Statistics />
       <Timeline />
+      <Portfolio />
       <Features />
       <Testimonials />
       <CTASection />
