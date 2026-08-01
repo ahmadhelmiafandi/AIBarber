@@ -20,6 +20,17 @@ class UserSeeder extends Seeder
         );
         $superadmin->assignRole('admin');
 
+        $adminMybarber = User::firstOrCreate(
+            ['email' => 'admin@mybarber.my.id'],
+            [
+                'name' => 'Admin MyBarber',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'status' => 'active'
+            ]
+        );
+        $adminMybarber->assignRole('admin');
+
         $customer = User::firstOrCreate(
             ['email' => 'customer@aibarber.com'],
             [
