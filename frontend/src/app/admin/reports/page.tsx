@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "@/components/ui/table"
-import { Download, DollarSign, TrendingUp, Users, Star } from "lucide-react"
+import { Download, DollarSign, TrendingUp, Star } from "lucide-react"
 
 const revenueCards = [
   { label: "Pendapatan Bulan Ini", value: "Rp 87.500.000", icon: DollarSign, change: "+18%" },

@@ -1,35 +1,48 @@
-import React from 'react';
-import { usePreviewQuery } from '@/hooks/use-ai-consultation';
-import { CheckCircle2, AlertTriangle, Loader2, Sparkles } from 'lucide-react';
+"use client";
 
-interface AiPreviewViewerProps {
-  previewId: string;
+import { Sparkles, CheckCircle2, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
+
+export interface AiPreviewData {
+  id?: string;
+  generated_image_url?: string;
+  identity_verified?: boolean;
+  identity_score?: number;
+  metric?: string;
+  threshold_used?: number;
 }
 
-export function AiPreviewViewer({ previewId }: AiPreviewViewerProps) {
-  const { data: preview, isLoading } = usePreviewQuery(previewId);
+interface AiPreviewViewerProps {
+  preview?: AiPreviewData | null;
+  previewId?: string;
+}
 
-  if (isLoading || (preview && (preview.status === 'pending' || preview.status === 'processing'))) {
+export function AiPreviewViewer({ preview, previewId }: AiPreviewViewerProps) {
+  const { data: fetchedPreview, isLoading } = useQuery({
+    queryKey: ["ai-preview", previewId],
+    queryFn: async () => {
+      if (!previewId) return null;
+      const res = await apiClient.get<{ data: AiPreviewData }>(`/ai/previews/${previewId}`);
+      return res.data.data;
+    },
+    enabled: !!previewId && !preview,
+  });
+
+  const activePreview = preview || fetchedPreview;
+
+  if (isLoading) {
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-slate-400 my-6 shadow-xl">
-        <Loader2 className="size-8 animate-spin text-amber-400 mx-auto mb-2" />
-        <p className="text-sm font-semibold text-white">Memproses Preview Hairstyle AI...</p>
-        <p className="text-xs text-slate-500 mt-1">Mengaplikasikan gaya rambut dan memverifikasi presisi identitas wajah</p>
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl my-6 text-center text-slate-100 space-y-3">
+        <Loader2 className="size-8 animate-spin text-amber-400 mx-auto" />
+        <p className="text-sm font-semibold">Memuat AI Preview...</p>
       </div>
     );
   }
 
-  if (!preview || preview.status === 'failed') {
-    return (
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center text-slate-400 my-6">
-        <AlertTriangle className="size-8 text-red-400 mx-auto mb-2" />
-        <p className="text-sm font-semibold text-white">Gagal Membuat Preview AI</p>
-        <p className="text-xs text-slate-500 mt-1">{preview?.error_message || 'Terjadi masalah saat memproses preview.'}</p>
-      </div>
-    );
-  }
+  if (!activePreview) return null;
 
-  const scorePct = preview.similarity_score ? Math.round(preview.similarity_score * 100) : 95;
+  const scorePct = Math.round((activePreview.identity_score ?? 0) * 100);
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl my-6 text-slate-100">
@@ -38,7 +51,7 @@ export function AiPreviewViewer({ previewId }: AiPreviewViewerProps) {
           <Sparkles className="size-5 text-amber-400" />
           AI Photorealistic Preview Result
         </h3>
-        {preview.identity_verified ? (
+        {activePreview.identity_verified ? (
           <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full font-semibold text-xs flex items-center gap-1">
             <CheckCircle2 className="size-3.5" />
             Identity Verified ({scorePct}%)
@@ -50,15 +63,16 @@ export function AiPreviewViewer({ previewId }: AiPreviewViewerProps) {
         )}
       </div>
 
-      {preview.generated_image_url && (
+      {activePreview.generated_image_url && (
         <div className="relative rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 aspect-video flex items-center justify-center">
-          <img src={preview.generated_image_url} alt="AI Generated Preview" className="w-full h-full object-cover" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={activePreview.generated_image_url} alt="AI Generated Preview" className="w-full h-full object-cover" />
         </div>
       )}
 
       <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-        <span>Metric: {preview.metric || 'face_recognition_v1'}</span>
-        <span>Threshold Used: {preview.threshold_used ?? 0.95}</span>
+        <span>Metric: {activePreview.metric || 'face_recognition_v1'}</span>
+        <span>Threshold Used: {activePreview.threshold_used ?? 0.95}</span>
       </div>
     </div>
   );

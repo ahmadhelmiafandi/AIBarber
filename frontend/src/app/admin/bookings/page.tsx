@@ -37,7 +37,6 @@ const allStatuses: BookingStatus[] = ["Menunggu", "Check In", "On Service", "Sel
 export default function BookingsPage() {
   const [bookings] = useState(initialBookings)
   const [tab, setTab] = useState("Semua")
-  const [dialogOpen, setDialogOpen] = useState(false)
 
   const filtered = tab === "Semua" ? bookings : bookings.filter((b) => b.status === tab)
 

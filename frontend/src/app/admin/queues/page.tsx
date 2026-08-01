@@ -10,7 +10,7 @@ import { Select, SelectOption } from "@/components/ui/select"
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog"
-import { Phone, SkipForward, XCircle, ArrowUp, Plus, User } from "lucide-react"
+import { Phone, SkipForward, XCircle, ArrowUp, Plus } from "lucide-react"
 
 type QueueStatus = "Dilayani" | "Menunggu" | "Dipanggil"
 

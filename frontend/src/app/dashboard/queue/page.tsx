@@ -18,7 +18,6 @@ import {
   LogIn,
   Loader2,
   CalendarDays,
-  ArrowRight,
 } from "lucide-react"
 
 const queueSteps = [
@@ -193,7 +192,6 @@ export default function QueuePage() {
                 {queueSteps.map((s, i) => {
                   const isActive = i === currentStepIndex
                   const isDone = i < currentStepIndex
-                  const isFuture = i > currentStepIndex
 
                   return (
                     <div key={s.key} className="flex items-center gap-4 relative">
