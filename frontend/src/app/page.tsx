@@ -165,10 +165,7 @@ function Hero() {
         </div>
 
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] lg:leading-[1.1] font-extrabold tracking-tight text-foreground max-w-[860px] mx-auto">
-          Temukan Gaya Rambut Paling Cocok Dengan{" "}
-          <span className="bg-gradient-to-r from-primary via-amber-500 to-amber-600 bg-clip-text text-transparent">
-            Kecerdasan AI
-          </span>
+          Temukan Gaya Rambut Paling Cocok Dengan Kecerdasan AI
         </h1>
         <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-[620px] mx-auto leading-relaxed">
           Platform barbershop modern pertama yang menggabungkan analisis AI bentuk wajah, simulasi virtual preview gaya rambut, dan sistem booking antrean real-time.
