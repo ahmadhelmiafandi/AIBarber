@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, User as UserIcon, Phone, Loader2 } from "lucide-react";
+import { Mail, Lock, User as UserIcon, Phone, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { AxiosError } from "axios";
 import { ApiError } from "@/types/api";
@@ -14,6 +14,9 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -94,20 +97,26 @@ export default function RegisterPage() {
     {
       key: "password",
       label: "Password",
-      type: "password",
+      type: showPassword ? "text" : "password",
       value: password,
       onChange: setPassword,
       placeholder: "••••••••",
       icon: Lock,
+      isPassword: true,
+      showState: showPassword,
+      toggleShow: () => setShowPassword(!showPassword),
     },
     {
       key: "confirmPassword",
       label: "Konfirmasi Password",
-      type: "password",
+      type: showConfirmPassword ? "text" : "password",
       value: confirmPassword,
       onChange: setConfirmPassword,
       placeholder: "••••••••",
       icon: Lock,
+      isPassword: true,
+      showState: showConfirmPassword,
+      toggleShow: () => setShowConfirmPassword(!showConfirmPassword),
     },
   ] as const;
 
@@ -142,8 +151,22 @@ export default function RegisterPage() {
                   value={f.value}
                   onChange={(e) => f.onChange(e.target.value)}
                   placeholder={f.placeholder}
-                  className="w-full h-11 pl-10 pr-4 rounded-[14px] border border-slate-800 bg-slate-950 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                  className="w-full h-11 pl-10 pr-10 rounded-[14px] border border-slate-800 bg-slate-950 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                 />
+                {"isPassword" in f && f.isPassword && (
+                  <button
+                    type="button"
+                    onClick={f.toggleShow}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    aria-label={f.showState ? "Sembunyikan Password" : "Tampilkan Password"}
+                  >
+                    {f.showState ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
+                  </button>
+                )}
               </div>
               {errors[f.key] && (
                 <p className="text-red-400 text-xs mt-1">
