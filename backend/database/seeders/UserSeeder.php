@@ -17,38 +17,38 @@ class UserSeeder extends Seeder
         if (!$adminMybarber) {
             $adminMybarber = new User();
             $adminMybarber->email = 'admin@mybarber.my.id';
-            $adminMybarber->name = 'Admin MyBarber';
-            $adminMybarber->role = 'admin';
-            $adminMybarber->status = 'active';
         }
+        $adminMybarber->name = 'Admin MyBarber';
+        $adminMybarber->role = 'admin';
+        $adminMybarber->status = 'active';
         $adminMybarber->password = Hash::make('password');
         $adminMybarber->save();
         $adminMybarber->syncRoles(['admin']);
 
         // 2. Demo Customer User
-        $customer = User::where('email', 'customer@mybarber.my.id')->first();
+        $customer = User::where('email', 'customer@mybarber.my.id')->orWhere('phone', '081234567890')->first();
         if (!$customer) {
             $customer = new User();
-            $customer->email = 'customer@mybarber.my.id';
-            $customer->name = 'Pelanggan Demo';
-            $customer->role = 'customer';
-            $customer->status = 'active';
-            $customer->phone = '081234567890';
         }
+        $customer->email = 'customer@mybarber.my.id';
+        $customer->name = 'Pelanggan Demo';
+        $customer->role = 'customer';
+        $customer->status = 'active';
+        $customer->phone = '081234567890';
         $customer->password = Hash::make('password');
         $customer->save();
         $customer->syncRoles(['customer']);
 
         // 3. Demo Barber User
-        $barber = User::where('email', 'barber@mybarber.my.id')->first();
+        $barber = User::where('email', 'barber@mybarber.my.id')->orWhere('phone', '081234567891')->first();
         if (!$barber) {
             $barber = new User();
-            $barber->email = 'barber@mybarber.my.id';
-            $barber->name = 'Budi (Barber)';
-            $barber->role = 'barber';
-            $barber->status = 'active';
-            $barber->phone = '081234567891';
         }
+        $barber->email = 'barber@mybarber.my.id';
+        $barber->name = 'Budi (Barber)';
+        $barber->role = 'barber';
+        $barber->status = 'active';
+        $barber->phone = '081234567891';
         $barber->password = Hash::make('password');
         $barber->save();
         $barber->syncRoles(['barber']);
