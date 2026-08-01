@@ -3,7 +3,6 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -21,7 +20,7 @@ class UserSeeder extends Seeder
         $adminMybarber->name = 'Admin MyBarber';
         $adminMybarber->role = 'admin';
         $adminMybarber->status = 'active';
-        $adminMybarber->password = Hash::make('password');
+        $adminMybarber->password = 'password';
         $adminMybarber->save();
         $adminMybarber->syncRoles(['admin']);
 
@@ -35,7 +34,7 @@ class UserSeeder extends Seeder
         $customer->role = 'customer';
         $customer->status = 'active';
         $customer->phone = '081234567890';
-        $customer->password = Hash::make('password');
+        $customer->password = 'password';
         $customer->save();
         $customer->syncRoles(['customer']);
 
@@ -49,7 +48,7 @@ class UserSeeder extends Seeder
         $barber->role = 'barber';
         $barber->status = 'active';
         $barber->phone = '081234567891';
-        $barber->password = Hash::make('password');
+        $barber->password = 'password';
         $barber->save();
         $barber->syncRoles(['barber']);
     }
