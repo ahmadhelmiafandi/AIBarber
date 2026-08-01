@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { useAuth } from "@/context/auth-context"
 import {
   LayoutDashboard,
   BrainCircuit,
@@ -21,6 +22,7 @@ import {
   X,
   LogOut,
   Scissors,
+  Loader2,
 } from "lucide-react"
 
 const navItems = [
@@ -52,7 +54,45 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, token, isLoading, logout } = useAuth()
+
   const pageTitle = pageTitles[pathname] || "Dashboard"
+
+  useEffect(() => {
+    if (!isLoading && !token) {
+      router.push("/auth/login")
+    }
+  }, [isLoading, token, router])
+
+  const handleLogout = async () => {
+    await logout()
+    router.push("/auth/login")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Memuat sesi pengguna...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!token) {
+    return null
+  }
+
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "US"
 
   return (
     <div className="flex h-screen bg-background">
@@ -73,7 +113,7 @@ export default function DashboardLayout({
           <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-primary">
             <Scissors className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-lg font-bold tracking-tight">AI Barbershop</span>
+          <span className="text-lg font-bold tracking-tight">MyBarber</span>
           <button
             className="ml-auto lg:hidden"
             onClick={() => setSidebarOpen(false)}
@@ -113,13 +153,21 @@ export default function DashboardLayout({
 
         <div className="flex items-center gap-3 p-4">
           <Avatar>
-            <AvatarFallback>AR</AvatarFallback>
+            <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="truncate text-sm font-medium">Ahmad Rizky</p>
-            <p className="truncate text-xs text-muted-foreground">ahmad@email.com</p>
+            <p className="truncate text-sm font-medium">{user?.name || "Pengguna"}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {user?.email || "user@mybarber.my.id"}
+            </p>
           </div>
-          <Button variant="ghost" size="icon" className="shrink-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0 text-muted-foreground hover:text-destructive"
+            onClick={handleLogout}
+            title="Keluar"
+          >
             <LogOut className="h-4 w-4" />
           </Button>
         </div>

@@ -20,7 +20,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Smart Barbershop",
+  title: "MyBarber",
   description: "AI-powered barbershop management system with smart booking, queue management, and personalized hair consultation.",
 };
 

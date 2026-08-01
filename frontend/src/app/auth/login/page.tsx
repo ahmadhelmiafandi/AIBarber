@@ -46,7 +46,7 @@ export default function LoginPage() {
       } else if (user.role === "admin" || user.role === "owner") {
         router.push("/admin/branches");
       } else {
-        router.push("/booking");
+        router.push("/dashboard/booking");
       }
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;
@@ -65,7 +65,7 @@ export default function LoginPage() {
       <div className="bg-slate-900 rounded-[20px] border border-slate-800 shadow-xl p-8 text-slate-100">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-white">
-            AI Barbershop
+            MyBarber
           </h1>
           <p className="text-sm text-slate-400 mt-1">
             Masuk ke akun Anda

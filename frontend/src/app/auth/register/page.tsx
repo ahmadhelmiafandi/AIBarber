@@ -47,7 +47,7 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await register({ name, email, password, phone });
-      router.push("/booking");
+      router.push("/dashboard/booking");
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;
       if (axiosError.response?.data?.message) {
@@ -116,7 +116,7 @@ export default function RegisterPage() {
       <div className="bg-slate-900 rounded-[20px] border border-slate-800 shadow-xl p-8 text-slate-100">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-white">
-            AI Barbershop
+            MyBarber
           </h1>
           <p className="text-sm text-slate-400 mt-1">
             Buat akun baru
