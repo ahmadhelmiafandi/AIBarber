@@ -59,6 +59,8 @@ class BackendDependencyEndpointsTest extends TestCase
             'branch_id' => $this->branch->id,
             'is_active' => true,
         ]);
+
+        Carbon::setTestNow(Carbon::parse('2026-08-01 07:00:00', 'Asia/Jakarta'));
     }
 
     public function test_get_active_queue_returns_customer_active_queue(): void

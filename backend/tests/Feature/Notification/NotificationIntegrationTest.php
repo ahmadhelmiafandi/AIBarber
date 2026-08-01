@@ -68,6 +68,8 @@ class NotificationIntegrationTest extends TestCase
             'branch_id' => $this->branch->id,
             'is_active' => true,
         ]);
+
+        Carbon::setTestNow(Carbon::parse('2026-08-01 07:00:00', 'Asia/Jakarta'));
     }
 
     public function test_booking_confirmed_creates_notification_after_commit(): void
