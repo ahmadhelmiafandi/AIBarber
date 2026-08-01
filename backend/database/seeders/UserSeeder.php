@@ -3,7 +3,6 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -13,46 +12,50 @@ class UserSeeder extends Seeder
             ['email' => 'admin@aibarber.com'],
             [
                 'name' => 'Super Admin',
-                'password' => Hash::make('password'),
+                'password' => 'password',
                 'role' => 'admin',
                 'status' => 'active'
             ]
         );
+        $superadmin->update(['password' => 'password']);
         $superadmin->assignRole('admin');
 
         $adminMybarber = User::firstOrCreate(
             ['email' => 'admin@mybarber.my.id'],
             [
                 'name' => 'Admin MyBarber',
-                'password' => Hash::make('password'),
+                'password' => 'password',
                 'role' => 'admin',
                 'status' => 'active'
             ]
         );
+        $adminMybarber->update(['password' => 'password']);
         $adminMybarber->assignRole('admin');
 
         $customer = User::firstOrCreate(
             ['email' => 'customer@aibarber.com'],
             [
                 'name' => 'John Doe',
-                'password' => Hash::make('password'),
+                'password' => 'password',
                 'role' => 'customer',
                 'status' => 'active',
                 'phone' => '081234567890'
             ]
         );
+        $customer->update(['password' => 'password']);
         $customer->assignRole('customer');
         
         $barber = User::firstOrCreate(
             ['email' => 'barber@aibarber.com'],
             [
                 'name' => 'Fadli Barber',
-                'password' => Hash::make('password'),
+                'password' => 'password',
                 'role' => 'barber',
                 'status' => 'active',
                 'phone' => '081234567891'
             ]
         );
+        $barber->update(['password' => 'password']);
         $barber->assignRole('barber');
     }
 }
