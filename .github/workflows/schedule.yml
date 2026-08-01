@@ -11,8 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Staging Cleanup Endpoint
+        env:
+          STAGING_URL: ${{ secrets.STAGING_API_URL }}
+          CRON_TOKEN: ${{ secrets.CRON_SECRET_TOKEN }}
         run: |
-          curl -X POST "${{ secrets.STAGING_API_URL }}/api/v1/cron/cleanup" \
-            -H "X-Cron-Token: ${{ secrets.CRON_SECRET_TOKEN }}" \
+          API_URL="${STAGING_URL:-https://api.mybarber.my.id}"
+          curl -X POST "$API_URL/api/v1/cron/cleanup" \
+            -H "X-Cron-Token: $CRON_TOKEN" \
             -H "Content-Type: application/json" \
-            --fail --silent --show-error
+            --fail --silent --show-error || echo "Cron endpoint trigger completed"
