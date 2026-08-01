@@ -9,6 +9,10 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Delete legacy demo account if present
+        User::where('email', 'admin@aibarber.com')->forceDelete();
+
+        // 1. Single Primary Admin User
         $adminMybarber = User::where('email', 'admin@mybarber.my.id')->first();
         if (!$adminMybarber) {
             $adminMybarber = new User();
@@ -21,23 +25,12 @@ class UserSeeder extends Seeder
         $adminMybarber->save();
         $adminMybarber->syncRoles(['admin']);
 
-        $superadmin = User::where('email', 'admin@aibarber.com')->first();
-        if (!$superadmin) {
-            $superadmin = new User();
-            $superadmin->email = 'admin@aibarber.com';
-            $superadmin->name = 'Super Admin';
-            $superadmin->role = 'admin';
-            $superadmin->status = 'active';
-        }
-        $superadmin->password = Hash::make('password');
-        $superadmin->save();
-        $superadmin->syncRoles(['admin']);
-
-        $customer = User::where('email', 'customer@aibarber.com')->first();
+        // 2. Demo Customer User
+        $customer = User::where('email', 'customer@mybarber.my.id')->first();
         if (!$customer) {
             $customer = new User();
-            $customer->email = 'customer@aibarber.com';
-            $customer->name = 'John Doe';
+            $customer->email = 'customer@mybarber.my.id';
+            $customer->name = 'Pelanggan Demo';
             $customer->role = 'customer';
             $customer->status = 'active';
             $customer->phone = '081234567890';
@@ -46,11 +39,12 @@ class UserSeeder extends Seeder
         $customer->save();
         $customer->syncRoles(['customer']);
 
-        $barber = User::where('email', 'barber@aibarber.com')->first();
+        // 3. Demo Barber User
+        $barber = User::where('email', 'barber@mybarber.my.id')->first();
         if (!$barber) {
             $barber = new User();
-            $barber->email = 'barber@aibarber.com';
-            $barber->name = 'Fadli Barber';
+            $barber->email = 'barber@mybarber.my.id';
+            $barber->name = 'Budi (Barber)';
             $barber->role = 'barber';
             $barber->status = 'active';
             $barber->phone = '081234567891';
