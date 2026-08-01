@@ -1,9 +1,17 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const getApiUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://api.mybarber.my.id/api/v1';
+  }
+  return 'http://localhost:8000/api/v1';
+};
 
 export const apiClient = axios.create({
-  baseURL: API_URL,
+  baseURL: getApiUrl(),
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -12,6 +20,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
+    config.baseURL = getApiUrl();
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth_token');
       if (token) {
