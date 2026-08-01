@@ -46,14 +46,7 @@ jobs:
 
       - name: Run Backend Tests
         env:
-          DB_CONNECTION: pgsql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 5432
-          DB_DATABASE: aibarber_test
-          DB_USERNAME: aibarber
-          DB_PASSWORD: secretpassword
-          REDIS_HOST: 127.0.0.1
-          REDIS_PORT: 6379
+          CACHE_STORE: array
           QUEUE_CONNECTION: sync
         run: |
           cd backend
