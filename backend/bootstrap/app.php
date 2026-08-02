@@ -4,6 +4,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,20 +25,24 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
-                if ($e instanceof \Illuminate\Validation\ValidationException) {
+                if ($e instanceof ValidationException) {
                     return response()->json([
                         'message' => $e->getMessage(),
                         'errors' => $e->errors(),
                     ], 422);
                 }
 
-                $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
-                return response()->json([
-                    'message' => $e->getMessage() ?: 'Server Error',
-                    'exception' => get_class($e),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ], $status >= 100 && $status < 600 ? $status : 500);
+                if ($e instanceof AuthenticationException) {
+                    return response()->json([
+                        'message' => 'Unauthenticated.',
+                    ], 401);
+                }
+
+                if ($e instanceof HttpExceptionInterface) {
+                    return response()->json([
+                        'message' => $e->getMessage() ?: 'HTTP Error',
+                    ], $e->getStatusCode());
+                }
             }
         });
     })->create();
