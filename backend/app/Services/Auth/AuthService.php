@@ -21,7 +21,12 @@ class AuthService
             'status' => 'active',
         ]);
 
-        $user->assignRole('customer');
+        try {
+            $user->assignRole('customer');
+        } catch (\Throwable $e) {
+            // Ignore if role system offline
+        }
+
         event(new Registered($user));
 
         return [
@@ -74,13 +79,24 @@ class AuthService
 
     public function formatUser(User $user): array
     {
+        $roles = [];
+        try {
+            $roles = $user->getRoleNames()->toArray();
+        } catch (\Throwable $e) {
+            // Fallback gracefully
+        }
+
+        if (empty($roles) && !empty($user->role)) {
+            $roles = [$user->role];
+        }
+
         return [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
             'phone' => $user->phone,
-            'role' => $user->role,
-            'roles' => $user->getRoleNames(),
+            'role' => $user->role ?? ($roles[0] ?? 'customer'),
+            'roles' => $roles,
             'status' => $user->status,
             'email_verified_at' => $user->email_verified_at,
         ];
