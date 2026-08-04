@@ -18,8 +18,11 @@ RUN composer install --optimize-autoloader --no-dev
 
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+# Make entrypoint executable
+RUN chmod +x /var/www/docker-entrypoint.sh
+
 # Render Web Service uses artisan serve; Docker Compose uses php-fpm
 EXPOSE 8000 9000
 
-# Default: Render-compatible HTTP server on port 8000
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Use entrypoint script to clear cached config before starting
+CMD ["/var/www/docker-entrypoint.sh"]
