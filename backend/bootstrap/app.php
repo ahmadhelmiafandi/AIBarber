@@ -1,5 +1,10 @@
 <?php
 
+$cachedConfig = __DIR__ . '/cache/config.php';
+if (file_exists($cachedConfig)) {
+    @unlink($cachedConfig);
+}
+
 $defaultAppKey = 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=';
 if (empty($_ENV['APP_KEY']) || $_ENV['APP_KEY'] === 'base64:' || strlen((string)$_ENV['APP_KEY']) < 10) {
     $_ENV['APP_KEY'] = $defaultAppKey;
