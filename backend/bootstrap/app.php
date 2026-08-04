@@ -20,7 +20,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -58,3 +58,8 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
     })->create();
+
+// Ensure app.key is always set in config repository
+$app->make('config')->set('app.key', 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=');
+
+return $app;
