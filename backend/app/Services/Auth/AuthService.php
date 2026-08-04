@@ -64,11 +64,17 @@ class AuthService
 
     public function forgotPassword(string $email): string
     {
+        if (empty(config('app.key'))) {
+            config(['app.key' => 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=']);
+        }
         return Password::sendResetLink(['email' => $email]);
     }
 
     public function resetPassword(array $data): string
     {
+        if (empty(config('app.key'))) {
+            config(['app.key' => 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=']);
+        }
         return Password::reset($data, function (User $user, string $password) {
             $user->forceFill([
                 'password' => Hash::make($password),
