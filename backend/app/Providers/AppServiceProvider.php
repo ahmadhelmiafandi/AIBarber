@@ -46,6 +46,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (empty(config('app.key'))) {
+            config(['app.key' => env('APP_KEY', 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=')]);
+        }
+
         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
             $frontendUrl = rtrim(config('app.frontend_url', 'http://localhost:3000'), '/');
             return "{$frontendUrl}/auth/reset-password?token={$token}&email=" . urlencode($notifiable->getEmailForPasswordReset());
