@@ -2,11 +2,14 @@
 
 namespace App\Providers;
 
+use App\Services\AI\Adapters\GeminiVisionAdapter;
 use App\Services\AI\Adapters\MockAiAdapter;
+use App\Services\AI\Adapters\OpenAiVisionAdapter;
 use App\Services\AI\Contracts\IdentityVerifierInterface;
 use App\Services\AI\Contracts\ImageGeneratorInterface;
 use App\Services\AI\Contracts\LLMProviderInterface;
 use App\Services\AI\Contracts\VisionProviderInterface;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -19,9 +22,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Default container bindings use MockAiAdapter for local / testing
-        $this->app->singleton(VisionProviderInterface::class, MockAiAdapter::class);
-        $this->app->singleton(LLMProviderInterface::class, MockAiAdapter::class);
+        $provider = env('AI_PROVIDER');
+        $hasGemini = !empty(env('GEMINI_API_KEY'));
+        $hasOpenAi = !empty(env('OPENAI_API_KEY'));
+
+        if ($provider === 'gemini' || ($hasGemini && $provider !== 'mock')) {
+            $this->app->singleton(VisionProviderInterface::class, GeminiVisionAdapter::class);
+            $this->app->singleton(LLMProviderInterface::class, GeminiVisionAdapter::class);
+        } elseif ($provider === 'openai' || ($hasOpenAi && $provider !== 'mock')) {
+            $this->app->singleton(VisionProviderInterface::class, OpenAiVisionAdapter::class);
+            $this->app->singleton(LLMProviderInterface::class, OpenAiVisionAdapter::class);
+        } else {
+            $this->app->singleton(VisionProviderInterface::class, MockAiAdapter::class);
+            $this->app->singleton(LLMProviderInterface::class, MockAiAdapter::class);
+        }
+
         $this->app->singleton(ImageGeneratorInterface::class, MockAiAdapter::class);
         $this->app->singleton(IdentityVerifierInterface::class, MockAiAdapter::class);
     }
@@ -31,6 +46,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
+            $frontendUrl = rtrim(config('app.frontend_url', 'http://localhost:3000'), '/');
+            return "{$frontendUrl}/auth/reset-password?token={$token}&email=" . urlencode($notifiable->getEmailForPasswordReset());
+        });
+
         RateLimiter::for('auth', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());
         });

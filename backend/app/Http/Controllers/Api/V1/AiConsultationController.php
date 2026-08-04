@@ -43,37 +43,51 @@ class AiConsultationController extends Controller
             ], 202);
         }
 
-        // Budget check before dispatching
-        $costService->reserveBudget(0.02000);
+        try {
+            // Budget check before dispatching
+            $costService->reserveBudget(0.02000);
 
-        $path = $request->file('image')->store('ai_uploads', 'public');
+            // Ensure destination directory exists
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('ai_uploads');
 
-        $recommendation = null;
+            $path = $request->file('image')->store('ai_uploads', 'public');
+            $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($path);
 
-        DB::transaction(function () use ($user, $idempotencyKey, $path, &$recommendation) {
-            $recommendation = AiRecommendation::create([
-                'id' => Str::uuid(),
-                'user_id' => $user->id,
-                'status' => 'pending',
-                'idempotency_key' => $idempotencyKey,
-                'engine_version' => 'v1.0',
-                'rule_version' => 'cms-v1',
-                'image_url' => $path,
-            ]);
+            $recommendation = null;
 
-            DB::afterCommit(function () use ($recommendation, $path) {
-                ProcessAiConsultationJob::dispatch($recommendation->id, storage_path('app/public/' . $path));
+            DB::transaction(function () use ($user, $idempotencyKey, $path, $fullPath, &$recommendation) {
+                $recommendation = AiRecommendation::create([
+                    'id' => Str::uuid(),
+                    'user_id' => $user->id,
+                    'status' => 'pending',
+                    'idempotency_key' => $idempotencyKey,
+                    'engine_version' => 'v1.0',
+                    'rule_version' => 'cms-v1',
+                    'image_url' => $path,
+                ]);
+
+                DB::afterCommit(function () use ($recommendation, $fullPath) {
+                    ProcessAiConsultationJob::dispatch($recommendation->id, $fullPath);
+                });
             });
-        });
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Analisis AI berhasil dijadwalkan.',
-            'data' => [
-                'consultation_id' => $recommendation->id,
-                'status' => 'pending',
-            ],
-        ], 202);
+            return response()->json([
+                'success' => true,
+                'message' => 'Analisis AI berhasil dijadwalkan.',
+                'data' => [
+                    'consultation_id' => $recommendation->id,
+                    'status' => 'pending',
+                ],
+            ], 202);
+        } catch (\Illuminate\Validation\ValidationException $ve) {
+            throw $ve;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AiConsultationController store error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memproses foto untuk analisis AI. ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function show(Request $request, string $id): JsonResponse

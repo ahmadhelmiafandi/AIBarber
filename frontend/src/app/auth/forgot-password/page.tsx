@@ -2,12 +2,14 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { Mail, ArrowLeft } from "lucide-react";
+import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+import apiClient from "@/lib/api-client";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   function validate() {
     const e: Record<string, string> = {};
@@ -17,12 +19,26 @@ export default function ForgotPasswordPage() {
     return e;
   }
 
-  function handleSubmit(ev: FormEvent) {
+  async function handleSubmit(ev: FormEvent) {
     ev.preventDefault();
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length > 0) return;
-    setSubmitted(true);
+
+    setLoading(true);
+    try {
+      await apiClient.post("/auth/forgot-password", { email });
+      setSubmitted(true);
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } };
+      const serverMsg = errorObj.response?.data?.message || "Gagal mengirim link reset password.";
+      const fieldErrors = errorObj.response?.data?.errors;
+      setErrors({
+        email: fieldErrors?.email?.[0] || serverMsg,
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -62,7 +78,8 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nama@email.com"
-                  className="w-full h-11 pl-10 pr-4 rounded-[14px] border border-input bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+                  disabled={loading}
+                  className="w-full h-11 pl-10 pr-4 rounded-[14px] border border-input bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow disabled:opacity-50"
                 />
               </div>
               {errors.email && (
@@ -72,9 +89,11 @@ export default function ForgotPasswordPage() {
 
             <button
               type="submit"
-              className="w-full h-11 rounded-[14px] bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
+              disabled={loading}
+              className="w-full h-11 rounded-[14px] bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              Kirim Link Reset
+              {loading && <Loader2 className="size-4 animate-spin" />}
+              <span>{loading ? "Mengirim..." : "Kirim Link Reset"}</span>
             </button>
           </form>
         )}

@@ -45,8 +45,12 @@ class ProcessAiConsultationJob implements ShouldQueue
             $estimatedCost = 0.02000;
             $auditService->reserveBudget($estimatedCost);
 
+            $resolvedImagePath = file_exists($this->imagePath)
+                ? $this->imagePath
+                : \Illuminate\Support\Facades\Storage::disk('public')->path($this->imagePath);
+
             // 1. Analyze Face & Hair Vision
-            $analysisResult = $visionProvider->analyzeFaceAndHair($this->imagePath);
+            $analysisResult = $visionProvider->analyzeFaceAndHair($resolvedImagePath);
 
             // 2. Create/Update Customer Face Profile
             $profile = CustomerFaceProfile::updateOrCreate(
