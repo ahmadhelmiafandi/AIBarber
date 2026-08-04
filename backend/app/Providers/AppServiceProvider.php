@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
                 $cleanKey = 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=';
             }
             $app['config']->set('app.key', $cleanKey);
-            return new \Illuminate\Auth\Passwords\PasswordBrokerManager($app);
+            return new \App\Services\Auth\CustomPasswordBrokerManager($app);
         });
     }
 
