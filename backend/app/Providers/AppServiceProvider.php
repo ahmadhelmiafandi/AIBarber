@@ -46,8 +46,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (empty(config('app.key'))) {
-            config(['app.key' => env('APP_KEY', 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=')]);
+        $appKey = config('app.key');
+        if (empty($appKey) || $appKey === 'base64:' || strlen((string)$appKey) < 10) {
+            config(['app.key' => 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=']);
         }
 
         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {

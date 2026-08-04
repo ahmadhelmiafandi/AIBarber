@@ -64,7 +64,8 @@ class AuthService
 
     public function forgotPassword(string $email): string
     {
-        if (empty(config('app.key'))) {
+        $appKey = config('app.key');
+        if (empty($appKey) || $appKey === 'base64:' || strlen((string)$appKey) < 10) {
             config(['app.key' => 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=']);
         }
         return Password::sendResetLink(['email' => $email]);
@@ -72,7 +73,8 @@ class AuthService
 
     public function resetPassword(array $data): string
     {
-        if (empty(config('app.key'))) {
+        $appKey = config('app.key');
+        if (empty($appKey) || $appKey === 'base64:' || strlen((string)$appKey) < 10) {
             config(['app.key' => 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=']);
         }
         return Password::reset($data, function (User $user, string $password) {
