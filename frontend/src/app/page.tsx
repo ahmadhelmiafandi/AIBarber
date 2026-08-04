@@ -250,100 +250,143 @@ function Hero() {
           </Link>
         </div>
 
-        <div className="mt-14 max-w-[860px] mx-auto rounded-2xl border border-border bg-card shadow-2xl p-4 sm:p-6 text-left relative overflow-hidden">
-          <div className="flex items-center justify-between pb-4 mb-4 border-b border-border/80">
+        <div className="mt-14 max-w-[960px] mx-auto rounded-3xl border border-slate-800 bg-slate-950/90 shadow-2xl p-5 sm:p-7 text-left relative overflow-hidden backdrop-blur-xl">
+          {/* Background Glow Accents */}
+          <div className="absolute -top-24 -left-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Window Header */}
+          <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-800/80 relative z-10">
             <div className="flex items-center gap-3">
               <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-rose-500/80" />
-                <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-                <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                <div className="w-3 h-3 rounded-full bg-rose-500/80 shadow-sm" />
+                <div className="w-3 h-3 rounded-full bg-amber-500/80 shadow-sm" />
+                <div className="w-3 h-3 rounded-full bg-emerald-500/80 shadow-sm" />
               </div>
-              <span className="text-xs font-mono text-muted-foreground ml-2">
+              <div className="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400">
                 ai-scanner.mybarber.my.id
-              </span>
+              </div>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 text-xs font-semibold">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-              <span>AI Engine Connected</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20 shadow-sm">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>AI Engine Active (Gemini 1.5)</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-muted/40 border border-border/60 flex flex-col justify-between">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10">
+            {/* Card 1: AI Scanner Result */}
+            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-colors">
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-foreground">ANALISIS WAJAH</span>
-                  <ScanFace className="w-4 h-4 text-primary" />
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wide">
+                    <ScanFace className="w-4 h-4 text-emerald-400" />
+                    <span>ANALISIS HASIL SKANER</span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                    VERIFIED
+                  </span>
                 </div>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-border/40">
-                    <span className="text-muted-foreground">Bentuk Wajah:</span>
-                    <span className="font-semibold text-foreground">Oval / Diamond</span>
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex justify-between items-center py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Bentuk Wajah:</span>
+                    <span className="font-semibold text-white px-2 py-0.5 rounded bg-slate-800">Oval / Diamond</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-border/40">
-                    <span className="text-muted-foreground">Simetri Wajah:</span>
-                    <span className="font-semibold text-emerald-600">98.4% High</span>
+                  <div className="flex justify-between items-center py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Simetri Wajah:</span>
+                    <span className="font-semibold text-emerald-400">98.4% Presisi</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-border/40">
-                    <span className="text-muted-foreground">Tekstur Rambut:</span>
-                    <span className="font-semibold text-foreground">Lurus Bergelombang</span>
+                  <div className="flex justify-between items-center py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Tekstur Rambut:</span>
+                    <span className="font-semibold text-white">Lurus Bergelombang</span>
                   </div>
-                  <div className="flex justify-between py-1">
-                    <span className="text-muted-foreground">Panjang Rambut:</span>
-                    <span className="font-semibold text-foreground">Sedang (Medium)</span>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-slate-400">Panjang Rambut:</span>
+                    <span className="font-semibold text-white">Medium (Sedang)</span>
                   </div>
                 </div>
               </div>
-              <div className="mt-4 pt-3 border-t border-border/60 flex items-center gap-2 text-[11px] text-muted-foreground">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              <div className="mt-5 pt-3 border-t border-slate-800 flex items-center gap-2 text-[11px] text-emerald-400">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>Rekomendasi Presisi Siap</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-primary">REKOMENDASI UTAMA</span>
-                  <Sparkles className="w-4 h-4 text-primary" />
-                </div>
-                <div className="text-lg font-bold text-foreground">Textured Crop Fade</div>
-                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                  Memberikan kesan tegas pada rahang dan tampilan modern ramping.
-                </p>
-                <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
-                  <Star className="w-3.5 h-3.5 fill-current" />
-                  <span>99% Match Score</span>
+            {/* Card 2: Hairstyle Visual Showcase Card */}
+            <div className="group relative rounded-2xl overflow-hidden border border-amber-500/40 bg-slate-900 shadow-xl flex flex-col justify-between">
+              <div className="h-44 relative overflow-hidden">
+                <img
+                  src="/images/hairstyles/textured_crop_fade.png"
+                  alt="Textured Crop Fade"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent flex flex-col justify-between p-4">
+                  <div className="flex justify-between items-start">
+                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 backdrop-blur-md border border-amber-500/30">
+                      Rekomendasi Utama
+                    </span>
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 backdrop-blur-md text-emerald-300 text-xs font-bold border border-emerald-500/30">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span>99% Match</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-white group-hover:text-amber-400 transition-colors">
+                      Textured Crop Fade
+                    </h3>
+                    <p className="text-[11px] text-slate-300 line-clamp-1 mt-0.5">
+                      Potongan bertekstur modern dengan gradasi fade presisi.
+                    </p>
+                  </div>
                 </div>
               </div>
-              <Link
-                href="/dashboard/ai-consultant"
-                className="mt-4 w-full py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold text-center hover:opacity-90 transition-opacity"
-              >
-                Coba Dengan Fotomu
-              </Link>
+
+              <div className="p-4 bg-slate-950/90 flex-1 flex flex-col justify-between border-t border-slate-800">
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span>Estimasi Pengerjaan:</span>
+                  <span className="font-semibold text-white">35 Menit</span>
+                </div>
+                <Link
+                  href="/dashboard/ai-consultant"
+                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs text-center shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all flex items-center justify-center gap-1.5"
+                >
+                  <Sparkles className="w-4 h-4 fill-slate-950" />
+                  <span>Coba Dengan Fotomu</span>
+                </Link>
+              </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-muted/40 border border-border/60 flex flex-col justify-between">
+            {/* Card 3: Live Queue & Barber Hub */}
+            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-colors">
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-foreground">STATUS ANTREAN LIVE</span>
-                  <Clock className="w-4 h-4 text-amber-500" />
-                </div>
-                <div className="text-sm font-semibold text-foreground">Cabang Sudirman</div>
-                <div className="mt-2 space-y-1.5 text-xs text-muted-foreground">
-                  <div className="flex justify-between">
-                    <span>Sedang Dilayani:</span>
-                    <span className="font-semibold text-foreground">Antrean #A-14</span>
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wide">
+                    <Clock className="w-4 h-4 text-amber-400" />
+                    <span>STATUS ANTREAN LIVE</span>
                   </div>
-                  <div className="flex justify-between">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                </div>
+                <div className="text-sm font-bold text-white mb-2">Cabang Sudirman</div>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between py-1 border-b border-slate-800/60 text-slate-400">
+                    <span>Sedang Dilayanan:</span>
+                    <span className="font-bold text-amber-400">Antrean #A-14</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60 text-slate-400">
                     <span>Estimasi Tunggu:</span>
-                    <span className="font-semibold text-emerald-600">&lt; 10 Menit</span>
+                    <span className="font-bold text-emerald-400">&lt; 10 Menit</span>
+                  </div>
+                  <div className="flex justify-between py-1 text-slate-400">
+                    <span>Master Barber:</span>
+                    <span className="font-semibold text-white">4 Barber Ready</span>
                   </div>
                 </div>
               </div>
-              <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between">
-                <span className="text-xs font-medium text-foreground">Barber Aktif: 4 Barber</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+
+              <div className="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px]">
+                <span className="text-slate-400">Pemesanan Online:</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
+                  Buka / Tersedia
+                </span>
               </div>
             </div>
           </div>
