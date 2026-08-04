@@ -43,6 +43,7 @@ const portfolioItems = [
     rating: 4.9,
     tag: "Trending",
     bgGradient: "from-amber-500/20 via-primary/10 to-purple-500/20",
+    image: "/images/hairstyles/textured_crop_fade.png",
     desc: "Potongan bertekstur pada bagian atas dengan gradasi mid fade yang memberikan kesan rapi dan maskulin.",
   },
   {
@@ -53,6 +54,7 @@ const portfolioItems = [
     rating: 5.0,
     tag: "Favorit Eksekutif",
     bgGradient: "from-blue-500/20 via-indigo-500/10 to-primary/20",
+    image: "/images/hairstyles/classic_side_part.png",
     desc: "Belahan samping bergaris tegas dipadukan dengan undercut halus untuk tampilan profesional nan elegan.",
   },
   {
@@ -63,6 +65,7 @@ const portfolioItems = [
     rating: 4.8,
     tag: "High Volume",
     bgGradient: "from-purple-500/20 via-pink-500/10 to-amber-500/20",
+    image: "/images/hairstyles/taper_fade_pompadour.png",
     desc: "Gaya pompadour modern dengan puncak rambut bervolume tinggi dan taper fade bersih di bagian samping.",
   },
   {
@@ -73,6 +76,7 @@ const portfolioItems = [
     rating: 4.9,
     tag: "Low Maintenance",
     bgGradient: "from-emerald-500/20 via-teal-500/10 to-primary/20",
+    image: "/images/hairstyles/french_crop_lineup.png",
     desc: "Poni lurus tegas dengan tekstur pendek di bagian atas. Sangat praktis untuk aktivitas harian padat.",
   },
   {
@@ -83,6 +87,7 @@ const portfolioItems = [
     rating: 4.9,
     tag: "Clean & Sharp",
     bgGradient: "from-orange-500/20 via-amber-500/10 to-rose-500/20",
+    image: "/images/hairstyles/buzz_cut_taper.png",
     desc: "Potongan sangat pendek yang dipadu dengan garis tepi presisi pisau cukur untuk kesan tajam dan sporty.",
   },
   {
@@ -93,6 +98,7 @@ const portfolioItems = [
     rating: 5.0,
     tag: "Premium Look",
     bgGradient: "from-cyan-500/20 via-blue-500/10 to-primary/20",
+    image: "/images/hairstyles/slicked_back_low_fade.png",
     desc: "Rambut disisir rapi ke belakang dengan pomade shine tinggi dan low drop fade melingkari telinga.",
   },
 ];
@@ -418,25 +424,32 @@ function Portfolio() {
               key={i}
               className="group rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 flex flex-col justify-between"
             >
-              <div className={`h-48 relative p-6 bg-gradient-to-br ${item.bgGradient} flex flex-col justify-between overflow-hidden`}>
-                <div className="flex items-center justify-between relative z-10">
-                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-background/80 backdrop-blur-md text-foreground border border-border/60">
-                    {item.category}
-                  </span>
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 text-xs font-bold border border-amber-500/20">
-                    <Star className="w-3.5 h-3.5 fill-current" />
-                    <span>{item.rating}</span>
+              <div className="h-56 relative overflow-hidden bg-slate-900">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-transparent flex flex-col justify-between p-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white border border-white/10">
+                      {item.category}
+                    </span>
+                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 backdrop-blur-md text-amber-300 text-xs font-bold border border-amber-500/30">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span>{item.rating}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] font-mono tracking-wider text-amber-400 uppercase font-bold px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 inline-block mb-1">
+                      {item.tag}
+                    </span>
+                    <h3 className="text-lg font-extrabold text-white group-hover:text-amber-400 transition-colors drop-shadow-md">
+                      {item.name}
+                    </h3>
                   </div>
                 </div>
-
-                <div className="relative z-10">
-                  <span className="text-xs font-mono tracking-wider text-primary uppercase font-bold">{item.tag}</span>
-                  <h3 className="text-xl font-extrabold text-foreground group-hover:text-primary transition-colors">
-                    {item.name}
-                  </h3>
-                </div>
-
-                <Scissors className="absolute -bottom-4 -right-4 w-32 h-32 text-foreground/5 group-hover:text-primary/10 transition-colors pointer-events-none" />
               </div>
 
               <div className="p-6 flex-1 flex flex-col justify-between space-y-4">

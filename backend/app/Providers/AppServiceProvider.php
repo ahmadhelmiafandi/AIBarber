@@ -40,12 +40,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ImageGeneratorInterface::class, MockAiAdapter::class);
         $this->app->singleton(IdentityVerifierInterface::class, MockAiAdapter::class);
 
-        // Ensure app.key is never empty when PasswordBrokerManager is resolved
+        // Ensure app.key is never empty or quoted when PasswordBrokerManager is resolved
         $this->app->singleton('auth.password', function ($app) {
-            $key = $app['config']['app.key'];
-            if (empty($key) || $key === 'base64:' || strlen((string)$key) < 10) {
-                $app['config']->set('app.key', 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=');
+            $rawKey = $app['config']['app.key'] ?? env('APP_KEY');
+            $cleanKey = trim((string)$rawKey, " \t\n\r\0\x0B\"'");
+            if (empty($cleanKey) || $cleanKey === 'base64:' || strlen($cleanKey) < 10) {
+                $cleanKey = 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=';
             }
+            $app['config']->set('app.key', $cleanKey);
             return new \Illuminate\Auth\Passwords\PasswordBrokerManager($app);
         });
     }
@@ -55,10 +57,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $appKey = config('app.key');
-        if (empty($appKey) || $appKey === 'base64:' || strlen((string)$appKey) < 10) {
-            config(['app.key' => 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=']);
+        $rawKey = config('app.key') ?: env('APP_KEY');
+        $cleanKey = trim((string)$rawKey, " \t\n\r\0\x0B\"'");
+        if (empty($cleanKey) || $cleanKey === 'base64:' || strlen($cleanKey) < 10) {
+            $cleanKey = 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=';
         }
+        config(['app.key' => $cleanKey]);
 
         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
             $frontendUrl = rtrim(config('app.frontend_url', 'http://localhost:3000'), '/');
