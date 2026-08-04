@@ -39,6 +39,15 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(ImageGeneratorInterface::class, MockAiAdapter::class);
         $this->app->singleton(IdentityVerifierInterface::class, MockAiAdapter::class);
+
+        // Ensure app.key is never empty when PasswordBrokerManager is resolved
+        $this->app->singleton('auth.password', function ($app) {
+            $key = $app['config']['app.key'];
+            if (empty($key) || $key === 'base64:' || strlen((string)$key) < 10) {
+                $app['config']->set('app.key', 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=');
+            }
+            return new \Illuminate\Auth\Passwords\PasswordBrokerManager($app);
+        });
     }
 
     /**
