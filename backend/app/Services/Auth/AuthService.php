@@ -3,6 +3,7 @@ namespace App\Services\Auth;
 
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -64,22 +65,47 @@ class AuthService
 
     public function forgotPassword(string $email): string
     {
-        config(['app.key' => 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=']);
-        return Password::sendResetLink(['email' => $email]);
+        $user = User::where('email', $email)->first();
+        if (!$user) {
+            return Password::INVALID_USER;
+        }
+
+        $token = Str::random(64);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+
+        $user->sendPasswordResetNotification($token);
+
+        return Password::RESET_LINK_SENT;
     }
 
     public function resetPassword(array $data): string
     {
-        $appKey = config('app.key');
-        if (empty($appKey) || $appKey === 'base64:' || strlen((string)$appKey) < 10) {
-            config(['app.key' => 'base64:G7TcTcA2PwSeF7ejDFc3+yOhJux5mxRVTur5sUFxR8=']);
+        $user = User::where('email', $data['email'])->first();
+        if (!$user) {
+            return Password::INVALID_USER;
         }
-        return Password::reset($data, function (User $user, string $password) {
-            $user->forceFill([
-                'password' => Hash::make($password),
-                'remember_token' => Str::random(60),
-            ])->save();
-        });
+
+        $record = DB::table('password_reset_tokens')->where('email', $data['email'])->first();
+        if (!$record || !Hash::check($data['token'], $record->token)) {
+            return Password::INVALID_TOKEN;
+        }
+
+        if (now()->subMinutes(60)->gt($record->created_at)) {
+            DB::table('password_reset_tokens')->where('email', $data['email'])->delete();
+            return Password::INVALID_TOKEN;
+        }
+
+        $user->forceFill([
+            'password' => Hash::make($data['password']),
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        DB::table('password_reset_tokens')->where('email', $data['email'])->delete();
+
+        return Password::PASSWORD_RESET;
     }
 
     public function formatUser(User $user): array
