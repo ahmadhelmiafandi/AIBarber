@@ -56,11 +56,16 @@ class AuthController extends Controller
     {
         $request->validate(['email' => ['required', 'email']]);
 
-        $status = $this->authService->forgotPassword($request->input('email'));
+        try {
+            $status = $this->authService->forgotPassword($request->input('email'));
 
-        return $status === Password::RESET_LINK_SENT
-            ? $this->successResponse('Link reset password telah dikirim.')
-            : $this->errorResponse('Email tidak ditemukan.', ['email' => [__($status)]], 422);
+            return $status === Password::RESET_LINK_SENT
+                ? $this->successResponse('Link reset password telah dikirim.')
+                : $this->errorResponse('Email tidak ditemukan.', ['email' => [__($status)]], 422);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('forgotPassword mail error: ' . $e->getMessage());
+            return $this->errorResponse('Gagal mengirim email reset password: ' . $e->getMessage(), [], 500);
+        }
     }
 
     public function resetPassword(Request $request): JsonResponse
