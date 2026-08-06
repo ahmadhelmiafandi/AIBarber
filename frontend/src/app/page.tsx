@@ -314,6 +314,7 @@ function Hero() {
             {/* Card 2: Hairstyle Visual Showcase Card */}
             <div className="group relative rounded-2xl overflow-hidden border border-amber-500/40 bg-slate-900 shadow-xl flex flex-col justify-between">
               <div className="h-44 relative overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/hairstyles/textured_crop_fade.png"
                   alt="Textured Crop Fade"
@@ -468,6 +469,7 @@ function Portfolio() {
               className="group rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 flex flex-col justify-between"
             >
               <div className="h-56 relative overflow-hidden bg-slate-900">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.image}
                   alt={item.name}
