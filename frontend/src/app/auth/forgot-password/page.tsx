@@ -31,11 +31,13 @@ export default function ForgotPasswordPage() {
       setSubmitted(true);
     } catch (err: unknown) {
       const errorObj = err as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } };
-      const serverMsg = errorObj.response?.data?.message || "Gagal mengirim link reset password.";
+      const serverMsg = errorObj.response?.data?.message || "Gagal mengirim link reset password. Silakan coba lagi.";
       const fieldErrors = errorObj.response?.data?.errors;
-      setErrors({
-        email: fieldErrors?.email?.[0] || serverMsg,
-      });
+      if (fieldErrors?.email?.[0]) {
+        setErrors({ email: fieldErrors.email[0] });
+      } else {
+        setErrors({ general: serverMsg });
+      }
     } finally {
       setLoading(false);
     }
@@ -67,6 +69,12 @@ export default function ForgotPasswordPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {errors.general && (
+              <div className="p-3.5 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs leading-relaxed font-medium">
+                {errors.general}
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-foreground mb-1.5">
                 Email
@@ -83,7 +91,7 @@ export default function ForgotPasswordPage() {
                 />
               </div>
               {errors.email && (
-                <p className="text-destructive text-xs mt-1">{errors.email}</p>
+                <p className="text-destructive text-xs mt-1 font-medium">{errors.email}</p>
               )}
             </div>
 

@@ -63,8 +63,10 @@ class AuthController extends Controller
                 ? $this->successResponse('Link reset password telah dikirim.')
                 : $this->errorResponse('Email tidak ditemukan.', ['email' => [__($status)]], 422);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('forgotPassword mail error: ' . $e->getMessage());
-            return $this->errorResponse('Gagal mengirim email reset password: ' . $e->getMessage(), [], 500);
+            \Illuminate\Support\Facades\Log::error('forgotPassword mail error: ' . $e->getMessage(), [
+                'exception' => $e
+            ]);
+            return $this->errorResponse('Gagal mengirim email reset password. Silakan hubungi administrator atau coba beberapa saat lagi.', [], 500);
         }
     }
 
