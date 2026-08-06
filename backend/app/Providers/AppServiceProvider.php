@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(IdentityVerifierInterface::class, MockAiAdapter::class);
 
         // Ensure app.key is never empty or quoted when PasswordBrokerManager is resolved
-        $this->app->singleton('auth.password', function ($app) {
+        $this->app->singleton(\Illuminate\Auth\Passwords\PasswordBrokerManager::class, function ($app) {
             $rawKey = $app['config']['app.key'] ?? env('APP_KEY');
             $cleanKey = trim((string)$rawKey, " \t\n\r\0\x0B\"'");
             if (empty($cleanKey) || $cleanKey === 'base64:' || strlen($cleanKey) < 10) {
@@ -49,6 +49,10 @@ class AppServiceProvider extends ServiceProvider
             }
             $app['config']->set('app.key', $cleanKey);
             return new \App\Services\Auth\CustomPasswordBrokerManager($app);
+        });
+
+        $this->app->singleton('auth.password', function ($app) {
+            return $app->make(\Illuminate\Auth\Passwords\PasswordBrokerManager::class);
         });
     }
 
