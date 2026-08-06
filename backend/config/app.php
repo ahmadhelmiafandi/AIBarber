@@ -52,7 +52,9 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://mybarber.my.id'),
+
+    'frontend_url' => env('FRONTEND_URL', 'https://mybarber.my.id'),
 
     /*
     |--------------------------------------------------------------------------

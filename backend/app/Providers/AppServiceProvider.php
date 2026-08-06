@@ -69,7 +69,18 @@ class AppServiceProvider extends ServiceProvider
         config(['app.key' => $cleanKey]);
 
         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
-            $frontendUrl = rtrim(config('app.frontend_url', 'http://localhost:3000'), '/');
+            $frontendUrl = env('FRONTEND_URL') ?: config('app.frontend_url');
+            
+            // If running in production or web request without explicit localhost FRONTEND_URL
+            if (empty($frontendUrl) || (str_contains($frontendUrl, 'localhost') && app()->environment('production'))) {
+                $frontendUrl = 'https://mybarber.my.id';
+            } elseif (request()->hasHeader('X-Forwarded-Host') || (request()->getHost() && request()->getHost() !== 'localhost')) {
+                $scheme = request()->getScheme();
+                $host = request()->header('X-Forwarded-Host') ?: request()->getHost();
+                $frontendUrl = "{$scheme}://{$host}";
+            }
+
+            $frontendUrl = rtrim((string)$frontendUrl, '/');
             return "{$frontendUrl}/auth/reset-password?token={$token}&email=" . urlencode($notifiable->getEmailForPasswordReset());
         });
 
