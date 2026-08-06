@@ -41,9 +41,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(IdentityVerifierInterface::class, MockAiAdapter::class);
 
         // Clear any pre-resolved cached instances of auth.password in IoC container
-        $this->app->forgetInstance('auth.password');
-        $this->app->forgetInstance('auth.password.broker');
-        $this->app->forgetInstance(\Illuminate\Auth\Passwords\PasswordBrokerManager::class);
+        if ($this->app instanceof \Illuminate\Container\Container) {
+            $this->app->forgetInstance('auth.password');
+            $this->app->forgetInstance('auth.password.broker');
+            $this->app->forgetInstance(\Illuminate\Auth\Passwords\PasswordBrokerManager::class);
+        }
 
         // Ensure app.key is never empty or quoted when PasswordBrokerManager is resolved
         $this->app->singleton(\Illuminate\Auth\Passwords\PasswordBrokerManager::class, function ($app) {
