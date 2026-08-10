@@ -106,46 +106,46 @@ const portfolioItems = [
 const features = [
   {
     icon: MessageSquare,
-    badge: "AI Powered",
+    badge: "Konsultasi AI",
     title: "AI Face & Style Consultant",
-    desc: "Konsultasi cerdas berbasis model AI Gemini untuk menganalisis simetri wajah, garis rahang, dan jenis rambut secara real-time.",
+    desc: "Konsultasi cerdas menganalisis bentuk wajah, kontur rahang, dan jenis rambut untuk memberikan saran gaya terbaik.",
   },
   {
     icon: Monitor,
-    badge: "AR Tech",
+    badge: "Preview Visual",
     title: "Virtual Hair Preview",
-    desc: "Lihat visualisasi gaya rambut baru langsung di foto wajahmu sebelum pemotongan dimulai. Tanpa rasa ragu!",
+    desc: "Visualisasikan simulasi potongan rambut langsung pada foto selfie-mu sebelum proses pemotongan dimulai.",
   },
   {
     icon: CalendarCheck,
-    badge: "Fast Booking",
-    title: "Smart Booking Engine",
-    desc: "Sistem jadwal cerdas yang menghubungkanmu langsung dengan slot kosong barber favorit tanpa tumpang tindih.",
+    badge: "Booking Online",
+    title: "Smart Booking System",
+    desc: "Pilih jam & barber favorit secara transparan tanpa perlu mengantre manual di lokasi.",
   },
   {
     icon: Clock,
-    badge: "Live Queue",
+    badge: "Antrean Live",
     title: "Real-time Queue Monitor",
-    desc: "Pantau antrean secara live dari HP. Sistem memberikan estimasi waktu panggilan presisi sehingga kamu tak perlu menunggu di tempat.",
+    desc: "Pantau pergerakan nomor antrean secara live dari smartphone dengan estimasi giliran yang akurat.",
   },
   {
     icon: History,
-    badge: "History Cloud",
-    title: "Hair Profile History",
-    desc: "Catatan riwayat potong rambut tersimpan aman di cloud. Barber dapat melihat catatan gaya favoritmu di setiap kunjungan.",
+    badge: "Catatan Gaya",
+    title: "Riwayat & Profil Rambut",
+    desc: "Simpan riwayat gaya potong dan preference khusus agar barber bisa memberikan hasil konsisten.",
   },
   {
     icon: Image,
-    badge: "Verified Barbers",
-    title: "Barber Portfolio Showcase",
-    desc: "Jelajahi galeri karya terbaik dari setiap spesialis barber di cabang Sudirman, Kemang, dan PIK.",
+    badge: "Master Barber",
+    title: "Galeri & Portofolio",
+    desc: "Jelajahi portofolio karya terbaik dari para master barber di setiap cabang resmi kami.",
   },
 ];
 
 const stats = [
-  { value: "10,000+", label: "Analisis Wajah AI" },
-  { value: "99.4%", label: "Akurasi Rekomendasi" },
-  { value: "4.9/5", label: "Rating Kepuasan Client" },
+  { value: "5,000+", label: "Pelanggan Terlayani" },
+  { value: "98%", label: "Tingkat Kepuasan" },
+  { value: "4.9/5", label: "Rating Layanan" },
   { value: "3 Cabang", label: "Jakarta & Sekitarnya" },
 ];
 
@@ -219,174 +219,153 @@ function Navbar() {
 function Hero() {
   return (
     <section className="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-primary/10 via-amber-500/10 to-purple-500/10 blur-[120px] pointer-events-none -z-10" />
-
       <div className="max-w-[1200px] mx-auto px-6 text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold tracking-wide mb-6">
-          <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-          <span>Generasi Baru Smart Barbershop & AI Face Analysis</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border bg-muted/50 text-foreground text-xs font-medium tracking-wide mb-6">
+          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+          <span>Smart Barbershop & AI Haircut Experience</span>
         </div>
 
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] lg:leading-[1.1] font-extrabold tracking-tight text-foreground max-w-[860px] mx-auto">
-          Temukan Gaya Rambut Paling Cocok Dengan Kecerdasan AI
+          Temukan Gaya Rambut Yang Paling Pas Untuk Karakter Wajahmu
         </h1>
         <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-[620px] mx-auto leading-relaxed">
-          Platform barbershop modern pertama yang menggabungkan analisis AI bentuk wajah, simulasi virtual preview gaya rambut, dan sistem booking antrean real-time.
+          Konsultasi berbasis AI untuk rekomendasi potongan rambut presisi, lengkap dengan booking antrean online dan preview gaya secara real-time.
         </p>
 
         <div className="mt-8 flex items-center justify-center gap-4 flex-wrap">
           <Link
             href="/dashboard/ai-consultant"
-            className="inline-flex items-center gap-2 text-sm font-semibold px-6 py-3.5 rounded-xl bg-primary text-primary-foreground hover:opacity-95 transition-all shadow-md hover:shadow-lg"
+            className="inline-flex items-center gap-2 text-sm font-semibold px-6 py-3.5 rounded-xl bg-primary text-primary-foreground hover:opacity-95 transition-all shadow-md"
           >
-            Mulai Analisis AI Gratis
+            Mulai Analisis Gaya
             <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
             href="/dashboard/booking"
             className="inline-flex items-center gap-2 text-sm font-semibold px-6 py-3.5 rounded-xl border border-border text-foreground hover:bg-muted transition-colors"
           >
-            Pesan Antrean Sekarang
+            Pesan Antrean Now
           </Link>
         </div>
 
-        <div className="mt-14 max-w-[960px] mx-auto rounded-3xl border border-slate-800 bg-slate-950/90 shadow-2xl p-5 sm:p-7 text-left relative overflow-hidden backdrop-blur-xl">
-          {/* Background Glow Accents */}
-          <div className="absolute -top-24 -left-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Window Header */}
-          <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-800/80 relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-rose-500/80 shadow-sm" />
-                <div className="w-3 h-3 rounded-full bg-amber-500/80 shadow-sm" />
-                <div className="w-3 h-3 rounded-full bg-emerald-500/80 shadow-sm" />
-              </div>
-              <div className="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400">
-                ai-scanner.mybarber.my.id
-              </div>
+        {/* Dashboard Preview Section */}
+        <div className="mt-14 max-w-[960px] mx-auto rounded-2xl border border-border bg-card shadow-xl p-5 sm:p-6 text-left">
+          {/* Header Bar */}
+          <div className="flex items-center justify-between pb-4 mb-5 border-b border-border/80 text-xs text-muted-foreground font-medium">
+            <div className="flex items-center gap-2">
+              <ScanFace className="w-4 h-4 text-primary" />
+              <span className="font-semibold text-foreground">Sistem Konsultasi & Antrean Digital</span>
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20 shadow-sm">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>AI Engine Active (Gemini 1.5)</span>
+            <div className="inline-flex items-center gap-1.5 text-emerald-500 font-medium">
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>Sistem Online</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10">
-            {/* Card 1: AI Scanner Result */}
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-colors">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Card 1: Character Analysis */}
+            <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-                  <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wide">
-                    <ScanFace className="w-4 h-4 text-emerald-400" />
-                    <span>ANALISIS HASIL SKANER</span>
-                  </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                    VERIFIED
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-border/60">
+                  <span className="text-xs font-bold text-foreground">Analisis Profil Wajah</span>
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                    Selesai
                   </span>
                 </div>
-                <div className="space-y-2.5 text-xs">
-                  <div className="flex justify-between items-center py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Bentuk Wajah:</span>
-                    <span className="font-semibold text-white px-2 py-0.5 rounded bg-slate-800">Oval / Diamond</span>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between items-center py-1 border-b border-border/40">
+                    <span className="text-muted-foreground">Bentuk Wajah:</span>
+                    <span className="font-semibold text-foreground">Oval / Diamond</span>
                   </div>
-                  <div className="flex justify-between items-center py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Simetri Wajah:</span>
-                    <span className="font-semibold text-emerald-400">98.4% Presisi</span>
+                  <div className="flex justify-between items-center py-1 border-b border-border/40">
+                    <span className="text-muted-foreground">Tekstur Rambut:</span>
+                    <span className="font-semibold text-foreground">Lurus Bergelombang</span>
                   </div>
-                  <div className="flex justify-between items-center py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Tekstur Rambut:</span>
-                    <span className="font-semibold text-white">Lurus Bergelombang</span>
+                  <div className="flex justify-between items-center py-1 border-b border-border/40">
+                    <span className="text-muted-foreground">Panjang Rambut:</span>
+                    <span className="font-semibold text-foreground">Medium (Sedang)</span>
                   </div>
                   <div className="flex justify-between items-center py-1">
-                    <span className="text-slate-400">Panjang Rambut:</span>
-                    <span className="font-semibold text-white">Medium (Sedang)</span>
+                    <span className="text-muted-foreground">Volume Samping:</span>
+                    <span className="font-semibold text-foreground">Tebal</span>
                   </div>
                 </div>
               </div>
-              <div className="mt-5 pt-3 border-t border-slate-800 flex items-center gap-2 text-[11px] text-emerald-400">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Rekomendasi Presisi Siap</span>
+              <div className="mt-4 pt-3 border-t border-border/60 flex items-center gap-2 text-[11px] text-muted-foreground">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Rekomendasi Potongan Tersedia</span>
               </div>
             </div>
 
-            {/* Card 2: Hairstyle Visual Showcase Card */}
-            <div className="group relative rounded-2xl overflow-hidden border border-amber-500/40 bg-slate-900 shadow-xl flex flex-col justify-between">
-              <div className="h-44 relative overflow-hidden">
+            {/* Card 2: Hairstyle Preview */}
+            <div className="group rounded-xl overflow-hidden border border-border bg-card flex flex-col justify-between shadow-sm">
+              <div className="h-40 relative overflow-hidden bg-slate-900">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/hairstyles/textured_crop_fade.png"
                   alt="Textured Crop Fade"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent flex flex-col justify-between p-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent flex flex-col justify-between p-3">
                   <div className="flex justify-between items-start">
-                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 backdrop-blur-md border border-amber-500/30">
+                    <span className="text-[10px] font-semibold text-amber-300 px-2 py-0.5 rounded bg-amber-950/80 backdrop-blur-sm border border-amber-500/30">
                       Rekomendasi Utama
                     </span>
-                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 backdrop-blur-md text-emerald-300 text-xs font-bold border border-emerald-500/30">
-                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                      <span>99% Match</span>
-                    </div>
                   </div>
                   <div>
-                    <h3 className="text-base font-extrabold text-white group-hover:text-amber-400 transition-colors">
+                    <h3 className="text-sm font-bold text-white">
                       Textured Crop Fade
                     </h3>
-                    <p className="text-[11px] text-slate-300 line-clamp-1 mt-0.5">
-                      Potongan bertekstur modern dengan gradasi fade presisi.
-                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 bg-slate-950/90 flex-1 flex flex-col justify-between border-t border-slate-800">
-                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+              <div className="p-3.5 flex-1 flex flex-col justify-between space-y-3">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Estimasi Pengerjaan:</span>
-                  <span className="font-semibold text-white">35 Menit</span>
+                  <span className="font-medium text-foreground">35 Menit</span>
                 </div>
                 <Link
                   href="/dashboard/ai-consultant"
-                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs text-center shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all flex items-center justify-center gap-1.5"
+                  className="w-full py-2 rounded-lg bg-primary text-primary-foreground font-semibold text-xs text-center hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
                 >
-                  <Sparkles className="w-4 h-4 fill-slate-950" />
-                  <span>Coba Dengan Fotomu</span>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Coba Konsultasi Foto</span>
                 </Link>
               </div>
             </div>
 
-            {/* Card 3: Live Queue & Barber Hub */}
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-colors">
+            {/* Card 3: Live Queue */}
+            <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-                  <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wide">
-                    <Clock className="w-4 h-4 text-amber-400" />
-                    <span>STATUS ANTREAN LIVE</span>
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-border/60">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                    <Clock className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Status Antrean Cabang</span>
                   </div>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 </div>
-                <div className="text-sm font-bold text-white mb-2">Cabang Sudirman</div>
+                <div className="text-xs font-bold text-foreground mb-2">Cabang Sudirman</div>
                 <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-slate-800/60 text-slate-400">
-                    <span>Sedang Dilayanan:</span>
-                    <span className="font-bold text-amber-400">Antrean #A-14</span>
+                  <div className="flex justify-between py-1 border-b border-border/40 text-muted-foreground">
+                    <span>Sedang Dilayani:</span>
+                    <span className="font-bold text-foreground">Antrean #A-14</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60 text-slate-400">
+                  <div className="flex justify-between py-1 border-b border-border/40 text-muted-foreground">
                     <span>Estimasi Tunggu:</span>
-                    <span className="font-bold text-emerald-400">&lt; 10 Menit</span>
+                    <span className="font-semibold text-foreground">&lt; 10 Menit</span>
                   </div>
-                  <div className="flex justify-between py-1 text-slate-400">
+                  <div className="flex justify-between py-1 text-muted-foreground">
                     <span>Master Barber:</span>
-                    <span className="font-semibold text-white">4 Barber Ready</span>
+                    <span className="font-semibold text-foreground">4 Barber Ready</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px]">
-                <span className="text-slate-400">Pemesanan Online:</span>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
-                  Buka / Tersedia
+              <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground">Pemesanan Online:</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
+                  Buka & Tersedia
                 </span>
               </div>
             </div>
@@ -468,39 +447,41 @@ function Portfolio() {
               key={i}
               className="group rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 flex flex-col justify-between"
             >
-              <div className="h-56 relative overflow-hidden bg-slate-900">
+              <div className="h-64 relative overflow-hidden bg-slate-900">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-transparent flex flex-col justify-between p-5">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/30 flex flex-col justify-between p-4 pointer-events-none">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white border border-white/10">
+                    <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white border border-white/10">
                       {item.category}
                     </span>
-                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 backdrop-blur-md text-amber-300 text-xs font-bold border border-amber-500/30">
+                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-amber-400 text-xs font-bold border border-white/10">
                       <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                       <span>{item.rating}</span>
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-mono tracking-wider text-amber-400 uppercase font-bold px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 inline-block mb-1">
+                    <span className="text-[10px] font-semibold text-amber-300 tracking-wide uppercase px-2 py-0.5 rounded bg-amber-950/80 backdrop-blur-sm border border-amber-500/30 inline-block mb-1">
                       {item.tag}
                     </span>
-                    <h3 className="text-lg font-extrabold text-white group-hover:text-amber-400 transition-colors drop-shadow-md">
-                      {item.name}
-                    </h3>
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  {item.desc}
-                </p>
+              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div>
+                  <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    {item.name}
+                  </h3>
+                  <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
 
                 <div className="space-y-3 pt-3 border-t border-border/60">
                   <div className="flex items-center justify-between text-xs">
