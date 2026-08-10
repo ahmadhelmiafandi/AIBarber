@@ -2,15 +2,7 @@
 
 use Illuminate\Support\Str;
 
-$defaultConnection = env('DB_CONNECTION', 'pgsql');
-$appEnv = env('APP_ENV', 'local');
-
-// FAIL-FAST GUARD: Prevent silent fallback to SQLite in staging/production
-if (in_array($appEnv, ['staging', 'production']) && $defaultConnection === 'sqlite') {
-    throw new RuntimeException(
-        "STAGING/PRODUCTION DATABASE MISCONFIGURATION: SQLite is strictly forbidden in {$appEnv} environment. Staging/Production must use PostgreSQL (Supabase)."
-    );
-}
+$dbUrl = env('DB_URL') ?: env('DATABASE_URL');
 
 return [
 
@@ -20,7 +12,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'default' => $defaultConnection,
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,7 +24,7 @@ return [
 
         'sqlite' => [
             'driver' => 'sqlite',
-            'url' => env('DB_URL'),
+            'url' => $dbUrl,
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
@@ -43,12 +35,12 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
+            'url' => $dbUrl,
+            'host' => env('DB_HOST') ?: env('MYSQLHOST', '127.0.0.1'),
+            'port' => env('DB_PORT') ?: env('MYSQLPORT', '3306'),
+            'database' => env('DB_DATABASE') ?: env('MYSQLDATABASE', 'laravel'),
+            'username' => env('DB_USERNAME') ?: env('MYSQLUSER', 'root'),
+            'password' => env('DB_PASSWORD') ?: env('MYSQLPASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
@@ -63,12 +55,12 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'postgres'),
-            'username' => env('DB_USERNAME', 'postgres'),
-            'password' => env('DB_PASSWORD', ''),
+            'url' => $dbUrl,
+            'host' => env('DB_HOST') ?: env('PGHOST', '127.0.0.1'),
+            'port' => env('DB_PORT') ?: env('PGPORT', '5432'),
+            'database' => env('DB_DATABASE') ?: env('PGDATABASE', 'postgres'),
+            'username' => env('DB_USERNAME') ?: env('PGUSER', 'postgres'),
+            'password' => env('DB_PASSWORD') ?: env('PGPASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
