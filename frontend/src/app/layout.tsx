@@ -143,7 +143,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -151,6 +151,7 @@ export default function RootLayout({
         />
       </head>
       <body
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased bg-slate-950 text-slate-50 min-h-screen`}
       >
         <QueryProvider>

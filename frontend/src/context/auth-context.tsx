@@ -17,40 +17,27 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window !== 'undefined') {
-      const storedUser = localStorage.getItem('auth_user');
-      if (storedUser) {
-        try {
-          return JSON.parse(storedUser);
-        } catch {
-          return null;
-        }
-      }
-    }
-    return null;
-  });
-
-  const [token, setToken] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth_token');
-    }
-    return null;
-  });
-
-  const [isLoading, setIsLoading] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return !localStorage.getItem('auth_token');
-    }
-    return true;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const queryClient = useQueryClient();
 
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = localStorage.getItem('auth_token');
-      if (!storedToken) {
+      const storedUser = localStorage.getItem('auth_user');
+
+      if (storedToken) {
+        setToken(storedToken);
+        if (storedUser) {
+          try {
+            setUser(JSON.parse(storedUser));
+          } catch {
+            // ignore JSON parse error
+          }
+        }
+      } else {
         setIsLoading(false);
         return;
       }
