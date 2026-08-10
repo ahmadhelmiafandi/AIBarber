@@ -15,7 +15,6 @@ import {
   Star,
   Scissors,
   ArrowRight,
-  Menu,
   CheckCircle2,
 } from "lucide-react";
 
