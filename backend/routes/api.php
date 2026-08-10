@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\BlogController;
 use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\BranchController;
 use App\Http\Controllers\Api\V1\CronController;
+use App\Http\Controllers\Api\V1\CustomerAdminController;
 use App\Http\Controllers\Api\V1\CustomerFavoriteController;
 use App\Http\Controllers\Api\V1\HairstyleController;
 use App\Http\Controllers\Api\V1\HairstyleImageController;
@@ -82,11 +83,12 @@ Route::prefix('v1')->group(function () {
         // AI Subsystem
         Route::post('/ai/consultations', [AiConsultationController::class, 'store'])->middleware('throttle:ai-consultation');
         Route::get('/ai/consultations/{id}', [AiConsultationController::class, 'show']);
-        Route::post('/ai/chat', [AiChatController::class, 'chat']);
+        Route::post('/ai/chat', [AiChatController::class, 'chat'])->middleware('throttle:ai-chat');
         Route::post('/ai/previews', [AiPreviewController::class, 'store'])->middleware('throttle:ai-preview');
         Route::get('/ai/previews/{id}', [AiPreviewController::class, 'show']);
 
-        // Admin AI CMS & Weights
+        // Admin Management Routes
+        Route::apiResource('/admin/customers', CustomerAdminController::class);
         Route::get('/admin/ai-rules', [AdminAiRulesController::class, 'index']);
         Route::post('/admin/ai-rules', [AdminAiRulesController::class, 'storeRule']);
         Route::post('/admin/ai-settings', [AdminAiRulesController::class, 'updateSettings']);

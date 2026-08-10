@@ -20,7 +20,7 @@ class BranchController extends Controller
     public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Branch::class);
-        $branches = $this->branchService->getAll($request->boolean('active_only'));
+        $branches = $this->branchService->getAll($request->boolean('active_only'), $request);
         
         return $this->successResponse('Data cabang berhasil diambil.', BranchResource::collection($branches));
     }

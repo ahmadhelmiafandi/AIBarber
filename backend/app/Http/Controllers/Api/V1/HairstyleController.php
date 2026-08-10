@@ -16,10 +16,10 @@ class HairstyleController extends Controller
 
     public function __construct(private readonly HairstyleService $hairstyleService) {}
 
-    public function index(): JsonResponse
+    public function index(\Illuminate\Http\Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Hairstyle::class);
-        $hairstyles = $this->hairstyleService->getAll();
+        $hairstyles = $this->hairstyleService->getAll($request);
         return $this->successResponse('Data gaya rambut berhasil diambil.', HairstyleResource::collection($hairstyles));
     }
 

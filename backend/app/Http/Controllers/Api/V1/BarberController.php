@@ -16,10 +16,10 @@ class BarberController extends Controller
 
     public function __construct(private readonly BarberService $barberService) {}
 
-    public function index(): JsonResponse
+    public function index(\Illuminate\Http\Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Barber::class);
-        $barbers = $this->barberService->getAll();
+        $barbers = $this->barberService->getAll($request);
         return $this->successResponse('Data barber berhasil diambil.', BarberResource::collection($barbers));
     }
 

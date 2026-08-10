@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
-import { ApiResponse, Barber, Hairstyle } from '@/types/api';
+import { ApiResponse, Barber, Hairstyle, User, Booking, PaginationMeta } from '@/types/api';
 
 export interface AiRuleItem {
   id: string;
@@ -19,13 +19,100 @@ export interface AiPromptItem {
   is_active: boolean;
 }
 
-export function useAdminBarbers() {
+export interface FetchQueryParams {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  status?: string;
+  branchId?: string;
+  date?: string;
+}
+
+// 1. Admin Customers Hook
+export function useAdminCustomers(params: FetchQueryParams = {}) {
+  const { page = 1, perPage = 10, search = '', status = '' } = params;
   return useQuery({
-    queryKey: ['admin-barbers'],
+    queryKey: ['admin-customers', page, perPage, search, status],
     queryFn: async () => {
-      const res = await apiClient.get<ApiResponse<Barber[]>>('/barbers');
+      const res = await apiClient.get<ApiResponse<User[]>>('/admin/customers', {
+        params: { page, per_page: perPage, search, status },
+      });
+      return {
+        data: res.data.data || [],
+        meta: (res.data.meta as PaginationMeta) || {
+          current_page: page,
+          last_page: 1,
+          per_page: perPage,
+          total: (res.data.data || []).length,
+          from: 1,
+          to: (res.data.data || []).length,
+        },
+      };
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useCreateCustomerMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { name: string; email: string; phone?: string; status?: string }) => {
+      const res = await apiClient.post<ApiResponse<User>>('/admin/customers', payload);
       return res.data.data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-customers'] });
+    },
+  });
+}
+
+// 2. Admin Bookings Hook
+export function useAdminBookings(params: FetchQueryParams = {}) {
+  const { page = 1, perPage = 10, search = '', status = '', branchId = '', date = '' } = params;
+  return useQuery({
+    queryKey: ['admin-bookings', page, perPage, search, status, branchId, date],
+    queryFn: async () => {
+      const res = await apiClient.get<ApiResponse<Booking[]>>('/bookings', {
+        params: { page, per_page: perPage, search, status, branch_id: branchId, date },
+      });
+      return {
+        data: res.data.data || [],
+        meta: (res.data.meta as PaginationMeta) || {
+          current_page: page,
+          last_page: 1,
+          per_page: perPage,
+          total: (res.data.data || []).length,
+          from: 1,
+          to: (res.data.data || []).length,
+        },
+      };
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+// 3. Admin Barbers Hook
+export function useAdminBarbers(params: FetchQueryParams = {}) {
+  const { page = 1, perPage = 10, search = '', branchId = '' } = params;
+  return useQuery({
+    queryKey: ['admin-barbers', page, perPage, search, branchId],
+    queryFn: async () => {
+      const res = await apiClient.get<ApiResponse<Barber[]>>('/barbers', {
+        params: { page, per_page: perPage, search, branch_id: branchId },
+      });
+      return {
+        data: res.data.data || [],
+        meta: (res.data.meta as PaginationMeta) || {
+          current_page: page,
+          last_page: 1,
+          per_page: perPage,
+          total: (res.data.data || []).length,
+          from: 1,
+          to: (res.data.data || []).length,
+        },
+      };
+    },
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -42,6 +129,57 @@ export function useCreateBarberMutation() {
   });
 }
 
+// 4. Admin Services Hook
+export function useAdminServices(params: FetchQueryParams = {}) {
+  const { page = 1, perPage = 10, search = '' } = params;
+  return useQuery({
+    queryKey: ['admin-services', page, perPage, search],
+    queryFn: async () => {
+      const res = await apiClient.get<ApiResponse<any[]>>('/services', {
+        params: { page, per_page: perPage, search },
+      });
+      return {
+        data: res.data.data || [],
+        meta: (res.data.meta as PaginationMeta) || {
+          current_page: page,
+          last_page: 1,
+          per_page: perPage,
+          total: (res.data.data || []).length,
+          from: 1,
+          to: (res.data.data || []).length,
+        },
+      };
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+// 5. Admin Hairstyles Hook
+export function useAdminHairstyles(params: FetchQueryParams = {}) {
+  const { page = 1, perPage = 10, search = '' } = params;
+  return useQuery({
+    queryKey: ['admin-hairstyles', page, perPage, search],
+    queryFn: async () => {
+      const res = await apiClient.get<ApiResponse<Hairstyle[]>>('/hairstyles', {
+        params: { page, per_page: perPage, search },
+      });
+      return {
+        data: res.data.data || [],
+        meta: (res.data.meta as PaginationMeta) || {
+          current_page: page,
+          last_page: 1,
+          per_page: perPage,
+          total: (res.data.data || []).length,
+          from: 1,
+          to: (res.data.data || []).length,
+        },
+      };
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+// 4. Admin AI Rules & Prompts
 export function useAdminAiRules() {
   return useQuery({
     queryKey: ['admin-ai-rules'],

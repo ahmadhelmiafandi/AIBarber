@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectOption } from "@/components/ui/select"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { SearchInput } from "@/components/ui/search-input"
+import { Pagination } from "@/components/ui/pagination"
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "@/components/ui/table"
@@ -17,39 +19,42 @@ import {
 import { Plus, Pencil, Star, Loader2 } from "lucide-react"
 import { useAdminBarbers } from "@/hooks/use-admin"
 
-const initialBarbersFallback = [
-  { id: "1", name: "Rafi Adriansyah", branch: "Cabang Kemang", specialization: "Fade, Pompadour", rating: 4.9, status: "Aktif", initials: "RA" },
-  { id: "2", name: "Gilang Pratama", branch: "Cabang Menteng", specialization: "Undercut, Buzz Cut", rating: 4.7, status: "Aktif", initials: "GP" },
-  { id: "3", name: "Hendra Kurniawan", branch: "Cabang Kemang", specialization: "Classic, Taper", rating: 4.8, status: "Aktif", initials: "HK" },
-  { id: "4", name: "Irfan Maulana", branch: "Cabang BSD", specialization: "Mullet, Textured Crop", rating: 4.5, status: "Cuti", initials: "IM" },
-]
-
 export default function BarbersPage() {
-  const { data: apiBarbers, isLoading } = useAdminBarbers()
+  const [search, setSearch] = useState("")
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  const barbersList = apiBarbers && apiBarbers.length > 0
-    ? apiBarbers.map((b) => ({
-        id: b.id,
-        name: b.user?.name || "Barber",
-        branch: b.branch?.name || "Cabang Utama",
-        specialization: b.specialization || "General Haircut",
-        rating: b.rating || 4.8,
-        status: b.status || "Aktif",
-        initials: (b.user?.name || "BA").substring(0, 2).toUpperCase(),
-      }))
-    : initialBarbersFallback
+  const { data: res, isLoading } = useAdminBarbers({
+    page,
+    perPage: pageSize,
+    search,
+  })
+
+  const barbersList = res?.data || []
+  const meta = res?.meta || { current_page: 1, last_page: 1, total: 0, per_page: 10 }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Barbers</h1>
-          <p className="text-sm text-muted-foreground">Kelola data barber</p>
+          <p className="text-sm text-muted-foreground">Kelola data barber dan spesialisasi</p>
         </div>
         <Button onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />Tambah Barber
         </Button>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <SearchInput
+          value={search}
+          onChange={(val) => {
+            setSearch(val)
+            setPage(1)
+          }}
+          placeholder="Cari nama barber atau keahlian..."
+        />
       </div>
 
       <Card>
@@ -59,45 +64,76 @@ export default function BarbersPage() {
               <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Foto</TableHead>
-                  <TableHead>Nama</TableHead>
-                  <TableHead>Cabang</TableHead>
-                  <TableHead>Spesialisasi</TableHead>
-                  <TableHead>Rating</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {barbersList.map((b) => (
-                  <TableRow key={b.id}>
-                    <TableCell>
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="text-[10px]">{b.initials}</AvatarFallback>
-                      </Avatar>
-                    </TableCell>
-                    <TableCell className="font-medium">{b.name}</TableCell>
-                    <TableCell>{b.branch}</TableCell>
-                    <TableCell className="text-muted-foreground">{b.specialization}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-3.5 w-3.5 fill-warning text-warning" />
-                        {b.rating}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={b.status === "Aktif" ? "success" : "warning"}>{b.status}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8"><Pencil className="h-3.5 w-3.5" /></Button>
-                    </TableCell>
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Foto</TableHead>
+                    <TableHead>Nama</TableHead>
+                    <TableHead>Cabang</TableHead>
+                    <TableHead>Spesialisasi</TableHead>
+                    <TableHead>Rating</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Aksi</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {barbersList.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                        Tidak ada data barber yang ditemukan.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    barbersList.map((b) => {
+                      const name = b.user?.name || "Barber"
+                      const initials = name.substring(0, 2).toUpperCase()
+                      return (
+                        <TableRow key={b.id}>
+                          <TableCell>
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>
+                            </Avatar>
+                          </TableCell>
+                          <TableCell className="font-medium">{name}</TableCell>
+                          <TableCell>{b.branch?.name || "Cabang Utama"}</TableCell>
+                          <TableCell className="text-muted-foreground">{b.specialization || "General Haircut"}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Star className="h-3.5 w-3.5 fill-warning text-warning" />
+                              {b.rating || 4.8}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={b.is_active ? "success" : "warning"}>
+                              {b.is_active ? "Aktif" : "Nonaktif"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="icon" className="h-8 w-8"><Pencil className="h-3.5 w-3.5" /></Button>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
+                  )}
+                </TableBody>
+              </Table>
+
+              {/* Pagination Footer */}
+              <div className="border-t px-4 py-2">
+                <Pagination
+                  currentPage={meta.current_page}
+                  totalPages={meta.last_page}
+                  totalItems={meta.total}
+                  pageSize={meta.per_page}
+                  onPageChange={(p) => setPage(p)}
+                  onPageSizeChange={(sz) => {
+                    setPageSize(sz)
+                    setPage(1)
+                  }}
+                />
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -109,16 +145,13 @@ export default function BarbersPage() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label>Nama</Label>
+              <Label>Nama Barber</Label>
               <Input placeholder="Nama barber" />
             </div>
             <div className="grid gap-2">
               <Label>Cabang</Label>
               <Select>
                 <SelectOption value="">Pilih cabang</SelectOption>
-                <SelectOption value="kemang">Cabang Kemang</SelectOption>
-                <SelectOption value="menteng">Cabang Menteng</SelectOption>
-                <SelectOption value="bsd">Cabang BSD</SelectOption>
               </Select>
             </div>
             <div className="grid gap-2">

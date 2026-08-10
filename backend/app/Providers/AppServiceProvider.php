@@ -114,5 +114,9 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('ai-preview', function (Request $request) {
             return Limit::perDay(3)->by($request->user()?->id ?: $request->ip());
         });
+
+        RateLimiter::for('ai-chat', function (Request $request) {
+            return Limit::perDay(20)->by($request->user()?->id ?: $request->ip());
+        });
     }
 }

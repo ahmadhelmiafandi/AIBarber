@@ -5,9 +5,27 @@ use App\Models\Service;
 
 class ServiceManagementService
 {
-    public function getAll(bool $activeOnly = false)
+    public function getAll(bool $activeOnly = false, $request = null)
     {
-        return Service::when($activeOnly, fn ($q) => $q->where('is_active', true))->get();
+        $query = Service::query();
+
+        if ($activeOnly) {
+            $query->where('is_active', true);
+        }
+
+        if ($request && $request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request) {
+            return \App\Helpers\QueryHelper::paginateOrAll($query, $request, 10);
+        }
+
+        return $query->get();
     }
 
     public function create(array $data): Service

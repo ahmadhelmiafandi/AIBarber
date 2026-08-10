@@ -1,8 +1,17 @@
+export interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number | null;
+  to: number | null;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T;
-  meta?: Record<string, unknown>;
+  meta?: PaginationMeta | Record<string, unknown> | null;
 }
 
 export interface ApiError {
@@ -16,6 +25,14 @@ export interface BarberProfile {
   is_active: boolean;
 }
 
+export interface MembershipInfo {
+  id?: string;
+  tier: string;
+  points?: number;
+  valid_until?: string | null;
+  status?: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -26,6 +43,7 @@ export interface User {
   email_verified_at?: string | null;
   notification_preferences?: Record<string, boolean> | null;
   barberProfile?: BarberProfile | null;
+  membership?: MembershipInfo | null;
   created_at?: string;
 }
 

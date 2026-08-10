@@ -40,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function barberProfile(): HasOne { return $this->hasOne(Barber::class); }
     public function faceProfile(): HasOne { return $this->hasOne(CustomerFaceProfile::class); }
+    public function membership(): HasOne { return $this->hasOne(Membership::class); }
     public function bookings(): HasMany { return $this->hasMany(Booking::class, 'customer_id'); }
     public function reviews(): HasMany { return $this->hasMany(Review::class); }
     public function aiAuditLogs(): HasMany { return $this->hasMany(AiAuditLog::class); }

@@ -20,7 +20,7 @@ class ServiceController extends Controller
     public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', HairService::class);
-        $services = $this->serviceManager->getAll($request->boolean('active_only'));
+        $services = $this->serviceManager->getAll($request->boolean('active_only'), $request);
         
         return $this->successResponse('Data layanan berhasil diambil.', ServiceResource::collection($services));
     }

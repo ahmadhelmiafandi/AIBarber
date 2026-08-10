@@ -7,43 +7,97 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectOption } from "@/components/ui/select"
+import { SearchInput } from "@/components/ui/search-input"
+import { Pagination } from "@/components/ui/pagination"
+import { useAdminCustomers, useCreateCustomerMutation } from "@/hooks/use-admin"
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "@/components/ui/table"
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog"
-import { Plus, Pencil, UserX } from "lucide-react"
+import { Plus, Pencil, UserX, Loader2 } from "lucide-react"
 
-const initialCustomers = [
-  { id: 1, name: "Ahmad Rizky", phone: "081234567890", email: "ahmad@email.com", membership: "Gold", status: "Aktif" },
-  { id: 2, name: "Budi Santoso", phone: "081298765432", email: "budi@email.com", membership: "Silver", status: "Aktif" },
-  { id: 3, name: "Chandra Wijaya", phone: "081355544433", email: "chandra@email.com", membership: "Bronze", status: "Aktif" },
-  { id: 4, name: "Dimas Pratama", phone: "081377788899", email: "dimas@email.com", membership: "-", status: "Nonaktif" },
-  { id: 5, name: "Eko Saputra", phone: "081399900011", email: "eko@email.com", membership: "Silver", status: "Aktif" },
-]
-
-const membershipColor = (m: string) => {
-  if (m === "Gold") return "warning"
-  if (m === "Silver") return "secondary"
-  if (m === "Bronze") return "default"
+const membershipColor = (m?: string) => {
+  if (!m) return "outline" as const
+  const lower = m.toLowerCase()
+  if (lower.includes("gold")) return "warning" as const
+  if (lower.includes("silver")) return "secondary" as const
+  if (lower.includes("bronze")) return "default" as const
   return "outline" as const
 }
 
 export default function CustomersPage() {
-  const [customers] = useState(initialCustomers)
+  const [search, setSearch] = useState("")
+  const [status, setStatus] = useState("")
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  // Form state
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+
+  const { data, isLoading } = useAdminCustomers({
+    page,
+    perPage: pageSize,
+    search,
+    status,
+  })
+
+  const createMutation = useCreateCustomerMutation()
+
+  const customers = data?.data || []
+  const meta = data?.meta || { current_page: 1, last_page: 1, total: 0, per_page: 10 }
+
+  const handleCreate = async () => {
+    if (!name || !email) return
+    await createMutation.mutateAsync({ name, email, phone })
+    setName("")
+    setEmail("")
+    setPhone("")
+    setDialogOpen(false)
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
-          <p className="text-sm text-muted-foreground">Kelola data pelanggan</p>
+          <p className="text-sm text-muted-foreground">Kelola data pelanggan dan keanggotaan</p>
         </div>
         <Button onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />Tambah Customer
         </Button>
+      </div>
+
+      {/* Filter and Search Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <SearchInput
+          value={search}
+          onChange={(val) => {
+            setSearch(val)
+            setPage(1)
+          }}
+          placeholder="Cari nama, email, atau telepon..."
+        />
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Select
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value)
+              setPage(1)
+            }}
+            className="w-full sm:w-40 h-9 text-xs"
+          >
+            <SelectOption value="">Semua Status</SelectOption>
+            <SelectOption value="active">Aktif</SelectOption>
+            <SelectOption value="inactive">Nonaktif</SelectOption>
+            <SelectOption value="suspended">Ditangguhkan</SelectOption>
+          </Select>
+        </div>
       </div>
 
       <Card>
@@ -60,59 +114,93 @@ export default function CustomersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customers.map((c) => (
-                <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.name}</TableCell>
-                  <TableCell>{c.phone}</TableCell>
-                  <TableCell>{c.email}</TableCell>
-                  <TableCell><Badge variant={membershipColor(c.membership)}>{c.membership}</Badge></TableCell>
-                  <TableCell>
-                    <Badge variant={c.status === "Aktif" ? "success" : "destructive"}>{c.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8"><Pencil className="h-3.5 w-3.5" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8"><UserX className="h-3.5 w-3.5" /></Button>
-                    </div>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                    Memuat data customer...
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : customers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    Tidak ada data customer yang ditemukan.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                customers.map((c) => (
+                  <TableRow key={c.id}>
+                    <TableCell className="font-medium">{c.name}</TableCell>
+                    <TableCell>{c.phone || "-"}</TableCell>
+                    <TableCell>{c.email}</TableCell>
+                    <TableCell>
+                      <Badge variant={membershipColor(c.membership?.tier)}>
+                        {c.membership?.tier ? c.membership.tier.toUpperCase() : "REGULAR"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={c.status === "active" ? "success" : "destructive"}>
+                        {c.status === "active" ? "Aktif" : "Nonaktif"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Nonaktifkan">
+                          <UserX className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
+
+          {/* Pagination Footer */}
+          <div className="border-t px-4 py-2">
+            <Pagination
+              currentPage={meta.current_page}
+              totalPages={meta.last_page}
+              totalItems={meta.total}
+              pageSize={meta.per_page}
+              onPageChange={(p) => setPage(p)}
+              onPageSizeChange={(sz) => {
+                setPageSize(sz)
+                setPage(1)
+              }}
+            />
+          </div>
         </CardContent>
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Tambah Customer</DialogTitle>
+            <DialogTitle>Tambah Customer Baru</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label>Nama</Label>
-              <Input placeholder="Nama lengkap" />
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama lengkap" />
             </div>
             <div className="grid gap-2">
               <Label>Telepon</Label>
-              <Input placeholder="08xxxxxxxxxx" />
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="08xxxxxxxxxx" />
             </div>
             <div className="grid gap-2">
               <Label>Email</Label>
-              <Input type="email" placeholder="email@example.com" />
-            </div>
-            <div className="grid gap-2">
-              <Label>Membership</Label>
-              <Select>
-                <SelectOption value="">Pilih tier</SelectOption>
-                <SelectOption value="bronze">Bronze</SelectOption>
-                <SelectOption value="silver">Silver</SelectOption>
-                <SelectOption value="gold">Gold</SelectOption>
-              </Select>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
-            <Button onClick={() => setDialogOpen(false)}>Simpan</Button>
+            <Button onClick={handleCreate} disabled={createMutation.isPending}>
+              {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Simpan
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

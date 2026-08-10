@@ -38,12 +38,46 @@ class BookingController extends Controller
 
     public function index(\Illuminate\Http\Request $request): JsonResponse
     {
-        $bookings = Booking::with(['branch', 'barber.user', 'service'])
-            ->where('customer_id', $request->user()->id)
-            ->latest()
-            ->get();
+        $user = $request->user();
+        $query = Booking::with(['customer', 'branch', 'barber.user', 'service']);
 
-        return $this->successResponse('Riwayat booking pengguna.', BookingResource::collection($bookings));
+        if ($user->role === 'customer') {
+            $query->where('customer_id', $user->id);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('booking_code', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function ($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('barber.user', function ($bq) use ($search) {
+                      $bq->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('service', function ($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('status') && $request->input('status') !== 'Semua') {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->input('branch_id'));
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('booking_date', $request->input('date'));
+        }
+
+        $query->latest();
+
+        $paginated = \App\Helpers\QueryHelper::paginateOrAll($query, $request, 10);
+
+        return $this->successResponse('Riwayat booking pengguna.', BookingResource::collection($paginated));
     }
 
     public function store(CreateBookingRequest $request): JsonResponse

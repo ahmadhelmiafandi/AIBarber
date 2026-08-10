@@ -13,10 +13,23 @@ class BlogController extends Controller
 {
     use ApiResponse;
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $blogs = Blog::latest()->get();
-        return $this->successResponse('Daftar artikel blog.', $blogs);
+        $query = Blog::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%")
+                  ->orWhere('author', 'like', "%{$search}%");
+            });
+        }
+
+        $query->latest();
+        $paginated = \App\Helpers\QueryHelper::paginateOrAll($query, $request, 10);
+
+        return $this->successResponse('Daftar artikel blog.', $paginated);
     }
 
     public function store(Request $request): JsonResponse
