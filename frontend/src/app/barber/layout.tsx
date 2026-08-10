@@ -72,8 +72,10 @@ export default function BarberLayout({
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">Barber</p>
           </div>
           <button
-            className="ml-auto lg:hidden"
+            type="button"
+            className="ml-auto p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer lg:hidden"
             onClick={() => setSidebarOpen(false)}
+            aria-label="Tutup Sidebar"
           >
             <X className="h-5 w-5" />
           </button>
@@ -125,8 +127,10 @@ export default function BarberLayout({
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-16 items-center gap-4 border-b border-border bg-card px-4 lg:px-8">
           <button
-            className="lg:hidden"
+            type="button"
+            className="lg:hidden flex items-center justify-center p-2 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted text-foreground cursor-pointer shrink-0 transition-colors"
             onClick={() => setSidebarOpen(true)}
+            aria-label="Buka Menu Sidebar"
           >
             <Menu className="h-5 w-5" />
           </button>
