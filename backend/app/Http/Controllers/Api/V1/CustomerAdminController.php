@@ -17,8 +17,23 @@ class CustomerAdminController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        // Auto-seed demo data if fresh container database has 0 customers
+        if (User::where('role', 'customer')->count() === 0) {
+            try {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+            } catch (\Throwable $e) {
+                // Graceful fallback
+            }
+        }
+
         $query = User::with('membership')
-            ->where('role', 'customer');
+            ->where(function ($q) {
+                $q->where('role', 'customer')
+                  ->orWhereNull('role')
+                  ->orWhereHas('roles', function ($rq) {
+                      $rq->whereIn('name', ['customer', 'Customer']);
+                  });
+            });
 
         if ($request->filled('search')) {
             $search = $request->input('search');

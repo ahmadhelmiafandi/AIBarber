@@ -278,15 +278,26 @@ export function useAdminAiPrompts() {
   });
 }
 
-export function useSaveAiPromptMutation() {
+export function useAdminBranches() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: { key: string; name: string; prompt_text: string }) => {
-      const res = await apiClient.post<ApiResponse<AiPromptItem>>('/admin/ai-prompts', payload);
-      return res.data.data;
+  return useQuery({
+    queryKey: ['admin-branches'],
+    queryFn: async () => {
+      const res = await apiClient.get<ApiResponse<Branch[]>>('/branches');
+      return res.data.data || [];
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-ai-prompts'] });
+  });
+}
+
+export function useAdminBranchQueues(branchId: string) {
+  return useQuery({
+    queryKey: ['admin-branch-queues', branchId],
+    queryFn: async () => {
+      if (!branchId) return [];
+      const res = await apiClient.get<ApiResponse<Queue[]>>(`/branches/${branchId}/queues`);
+      return res.data.data || [];
     },
+    enabled: !!branchId,
+    refetchInterval: 5000,
   });
 }

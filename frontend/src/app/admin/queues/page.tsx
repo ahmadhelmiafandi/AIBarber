@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,125 +10,198 @@ import { Select, SelectOption } from "@/components/ui/select"
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog"
-import { Phone, SkipForward, XCircle, ArrowUp, Plus } from "lucide-react"
-
-type QueueStatus = "Dilayani" | "Menunggu" | "Dipanggil"
-
-const initialQueue = [
-  { id: 1, number: "A-002", customer: "Budi Santoso", barber: "Gilang Pratama", service: "Hair Wash + Haircut", status: "Dilayani" as QueueStatus, waitTime: "0 min" },
-  { id: 2, number: "A-003", customer: "Chandra Wijaya", barber: "Hendra Kurniawan", service: "Beard Trim", status: "Dipanggil" as QueueStatus, waitTime: "2 min" },
-  { id: 3, number: "A-004", customer: "Dimas Pratama", barber: "Rafi Adriansyah", service: "Hair Coloring", status: "Menunggu" as QueueStatus, waitTime: "15 min" },
-  { id: 4, number: "A-005", customer: "Eko Saputra", barber: "Gilang Pratama", service: "Haircut", status: "Menunggu" as QueueStatus, waitTime: "25 min" },
-  { id: 5, number: "A-006", customer: "Fajar Nugroho", barber: "-", service: "Haircut", status: "Menunggu" as QueueStatus, waitTime: "35 min" },
-  { id: 6, number: "A-007", customer: "Gunawan", barber: "-", service: "Beard Trim", status: "Menunggu" as QueueStatus, waitTime: "40 min" },
-]
-
-const statusStyle: Record<QueueStatus, string> = {
-  "Dilayani": "bg-success/10 border-success/30 text-success",
-  "Dipanggil": "bg-primary/10 border-primary/30 text-primary",
-  "Menunggu": "bg-muted border-border text-muted-foreground",
-}
+import { Phone, SkipForward, XCircle, ArrowUp, Plus, Loader2, RefreshCw, Layers } from "lucide-react"
+import { useAdminBranches, useAdminBranchQueues } from "@/hooks/use-admin"
+import { Queue } from "@/types/api"
 
 export default function QueuesPage() {
-  const [queue] = useState(initialQueue)
+  const { data: branches = [], isLoading: isLoadingBranches } = useAdminBranches()
+  const [selectedBranchId, setSelectedBranchId] = useState<string>("")
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  const serving = queue.filter((q) => q.status === "Dilayani")
-  const called = queue.filter((q) => q.status === "Dipanggil")
-  const waiting = queue.filter((q) => q.status === "Menunggu")
+  useEffect(() => {
+    if (branches.length > 0 && !selectedBranchId) {
+      setSelectedBranchId(branches[0].id)
+    }
+  }, [branches, selectedBranchId])
+
+  const { data: queues = [], isLoading: isLoadingQueues, refetch } = useAdminBranchQueues(selectedBranchId)
+
+  // Categorize queues by status from real API data
+  const serving = queues.filter((q) => q.status === "on_service")
+  const called = queues.filter((q) => q.status === "called" || q.status === "checked_in")
+  const waiting = queues.filter((q) => q.status === "waiting")
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Antrian</h1>
-          <p className="text-sm text-muted-foreground">Manajemen antrian real-time</p>
+          <h1 className="text-2xl font-bold tracking-tight">Antrean</h1>
+          <p className="text-sm text-muted-foreground">Manajemen antrian real-time cabang barbershop</p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => setDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />Tambah Manual
+
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Branch Selector */}
+          <Select
+            value={selectedBranchId}
+            onChange={(e) => setSelectedBranchId(e.target.value)}
+            className="w-48 text-xs h-9"
+          >
+            {branches.map((b) => (
+              <SelectOption key={b.id} value={b.id}>
+                {b.name}
+              </SelectOption>
+            ))}
+          </Select>
+
+          <Button variant="outline" size="sm" onClick={() => refetch()} className="h-9">
+            <RefreshCw className="h-3.5 w-3.5 mr-1" />
+            Refresh
+          </Button>
+
+          <Button onClick={() => setDialogOpen(true)} className="h-9">
+            <Plus className="mr-1.5 h-4 w-4" />Tambah Manual
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="border-success/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-success">Sedang Dilayani</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {serving.map((q) => (
-              <div key={q.id} className={`rounded-[14px] border p-4 ${statusStyle[q.status]}`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold font-mono">{q.number}</span>
-                  <Badge variant="success">Dilayani</Badge>
-                </div>
-                <p className="mt-1 text-sm font-medium">{q.customer}</p>
-                <p className="text-xs opacity-80">{q.barber} • {q.service}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card className="border-primary/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-primary">Dipanggil</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {called.map((q) => (
-              <div key={q.id} className={`rounded-[14px] border p-4 ${statusStyle[q.status]}`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold font-mono">{q.number}</span>
-                  <Badge>Dipanggil</Badge>
-                </div>
-                <p className="mt-1 text-sm font-medium">{q.customer}</p>
-                <p className="text-xs opacity-80">{q.barber} • {q.service}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
+      {isLoadingBranches || isLoadingQueues ? (
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Menunggu ({waiting.length})</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {waiting.map((q) => (
-              <div key={q.id} className={`rounded-[14px] border p-4 ${statusStyle[q.status]}`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold font-mono">{q.number}</span>
-                  <span className="text-xs">~{q.waitTime}</span>
-                </div>
-                <p className="mt-1 text-sm font-medium">{q.customer}</p>
-                <p className="text-xs opacity-80">{q.barber === "-" ? "Belum ditentukan" : q.barber} • {q.service}</p>
-                <div className="mt-3 pt-2.5 border-t border-border/40 grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                  <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center">
-                    <Phone className="mr-1 h-3 w-3 shrink-0" />
-                    <span>Panggil</span>
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center">
-                    <SkipForward className="mr-1 h-3 w-3 shrink-0" />
-                    <span>Lewati</span>
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center text-destructive hover:text-destructive">
-                    <XCircle className="mr-1 h-3 w-3 shrink-0" />
-                    <span>Batal</span>
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center">
-                    <ArrowUp className="mr-1 h-3 w-3 shrink-0" />
-                    <span>Prioritas</span>
-                  </Button>
-                </div>
-              </div>
-            ))}
+          <CardContent className="flex items-center justify-center p-12 text-muted-foreground">
+            <Loader2 className="h-6 w-6 animate-spin text-primary mr-2" />
+            Memuat data antrean real-time...
           </CardContent>
         </Card>
-      </div>
+      ) : queues.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+            <Layers className="h-10 w-10 mb-3 opacity-40 text-primary" />
+            <h3 className="font-semibold text-foreground text-base">Belum Ada Antrean Aktif</h3>
+            <p className="text-xs max-w-sm mt-1">
+              Saat ini belum ada pelanggan yang melakukan booking atau mengambil antrean di cabang ini.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {/* Sedang Dilayani */}
+          <Card className="border-success/30">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-success flex items-center justify-between">
+                <span>Sedang Dilayani</span>
+                <Badge variant="success" className="font-mono">{serving.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {serving.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-4 text-center">Tidak ada yang sedang dilayani</p>
+              ) : (
+                serving.map((q) => (
+                  <div key={q.queue_id || q.booking_id} className="rounded-[14px] border p-4 bg-success/10 border-success/30 text-success space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold font-mono">{q.queue_code || `A-${q.queue_number}`}</span>
+                      <Badge variant="success">Dilayani</Badge>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {q.booking?.customer?.name || "Pelanggan"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {q.booking?.barber?.user?.name || "Barber"} • {q.booking?.service?.name || "Layanan"}
+                    </p>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
 
+          {/* Dipanggil */}
+          <Card className="border-primary/30">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-primary flex items-center justify-between">
+                <span>Dipanggil / Checked In</span>
+                <Badge className="font-mono">{called.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {called.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-4 text-center">Tidak ada yang dipanggil</p>
+              ) : (
+                called.map((q) => (
+                  <div key={q.queue_id || q.booking_id} className="rounded-[14px] border p-4 bg-primary/10 border-primary/30 text-primary space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold font-mono">{q.queue_code || `A-${q.queue_number}`}</span>
+                      <Badge>Dipanggil</Badge>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {q.booking?.customer?.name || "Pelanggan"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {q.booking?.barber?.user?.name || "Barber"} • {q.booking?.service?.name || "Layanan"}
+                    </p>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Menunggu */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
+                <span>Menunggu ({waiting.length})</span>
+                <Badge variant="outline" className="font-mono">{waiting.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {waiting.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-4 text-center">Tidak ada antrean menunggu</p>
+              ) : (
+                waiting.map((q) => (
+                  <div key={q.queue_id || q.booking_id} className="rounded-[14px] border p-4 bg-card space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold font-mono">{q.queue_code || `A-${q.queue_number}`}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {q.estimated_start_time ? q.estimated_start_time.substring(11, 16) : "~15 min"}
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {q.booking?.customer?.name || "Pelanggan"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {q.booking?.barber?.user?.name || "Belum ditentukan"} • {q.booking?.service?.name || "Layanan"}
+                    </p>
+
+                    <div className="mt-3 pt-2.5 border-t border-border/40 grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                      <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center">
+                        <Phone className="mr-1 h-3 w-3 shrink-0" />
+                        <span>Panggil</span>
+                      </Button>
+                      <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center">
+                        <SkipForward className="mr-1 h-3 w-3 shrink-0" />
+                        <span>Lewati</span>
+                      </Button>
+                      <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center text-destructive hover:text-destructive">
+                        <XCircle className="mr-1 h-3 w-3 shrink-0" />
+                        <span>Batal</span>
+                      </Button>
+                      <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center">
+                        <ArrowUp className="mr-1 h-3 w-3 shrink-0" />
+                        <span>Prioritas</span>
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Manual Queue Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Tambah Antrian Manual</DialogTitle>
+            <DialogTitle>Tambah Antrean Manual</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -145,19 +218,10 @@ export default function QueuesPage() {
                 <SelectOption value="coloring">Hair Coloring</SelectOption>
               </Select>
             </div>
-            <div className="grid gap-2">
-              <Label>Barber (opsional)</Label>
-              <Select>
-                <SelectOption value="">Auto-assign</SelectOption>
-                <SelectOption value="rafi">Rafi Adriansyah</SelectOption>
-                <SelectOption value="gilang">Gilang Pratama</SelectOption>
-                <SelectOption value="hendra">Hendra Kurniawan</SelectOption>
-              </Select>
-            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
-            <Button onClick={() => setDialogOpen(false)}>Tambah ke Antrian</Button>
+            <Button onClick={() => setDialogOpen(false)}>Tambah ke Antrean</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
