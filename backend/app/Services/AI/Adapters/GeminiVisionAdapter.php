@@ -136,9 +136,9 @@ class GeminiVisionAdapter implements VisionProviderInterface, LLMProviderInterfa
 
         if ($apiKey) {
             try {
-                $systemPrompt = "Anda adalah AI Smart Barbershop Consultant yang sangat ahli dan ramah dalam memberikan saran gaya rambut, perawatan rambut, serta style cukur pria. "
-                    . "Profil pengguna: Nama '{$context['user_name']}', Bentuk Wajah '{$context['face_shape']}', Tekstur Rambut '{$context['hair_texture']}', Kepadatan Rambut '{$context['hair_density']}'. "
-                    . "Berikan jawaban yang membantu, singkat, dan tepat sasaran dalam Bahasa Indonesia.";
+                $systemPrompt = "Anda adalah AI Smart Barbershop Consultant, pakar tata rambut pria (men's grooming & hair styling expert) yang profesional, terpercaya, dan ramah.\n"
+                    . "Profil pengguna: Nama '{$context['user_name']}', Bentuk Wajah '{$context['face_shape']}', Tekstur Rambut '{$context['hair_texture']}', Kepadatan Rambut '{$context['hair_density']}'.\n"
+                    . "Berikan jawaban konsultasi gaya rambut dan grooming yang sangat membantu, ramah, presisi, serta terstruktur rapi dalam Bahasa Indonesia.";
 
                 $contents = [];
                 foreach ($messages as $msg) {
