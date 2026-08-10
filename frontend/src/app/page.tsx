@@ -225,8 +225,8 @@ function Hero() {
           <span>Smart Barbershop & AI Haircut Experience</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] lg:leading-[1.1] font-extrabold tracking-tight text-foreground max-w-[860px] mx-auto">
-          Temukan Gaya Rambut Yang Paling Pas Untuk Karakter Wajahmu
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] lg:leading-[1.1] font-extrabold tracking-tight text-foreground max-w-[880px] mx-auto">
+          Barbershop AI #1 Jakarta — Temukan Gaya Rambut Pas Sesuai Karakter Wajahmu
         </h1>
         <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-[620px] mx-auto leading-relaxed">
           Konsultasi berbasis AI untuk rekomendasi potongan rambut presisi, lengkap dengan booking antrean online dan preview gaya secara real-time.
