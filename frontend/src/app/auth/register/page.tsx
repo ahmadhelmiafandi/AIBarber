@@ -53,11 +53,20 @@ export default function RegisterPage() {
       router.push("/dashboard/booking");
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;
-      if (axiosError.response?.data?.message) {
-        setServerError(axiosError.response.data.message);
-      } else if (axiosError.response?.data?.errors) {
-        const firstErr = Object.values(axiosError.response.data.errors)[0]?.[0];
-        setServerError(firstErr || "Gagal mendaftar. Silakan coba lagi.");
+      const respData = axiosError.response?.data;
+
+      if (respData?.errors && typeof respData.errors === "object") {
+        const fieldErrors: Record<string, string> = {};
+        for (const [key, msgs] of Object.entries(respData.errors)) {
+          if (Array.isArray(msgs) && msgs[0]) {
+            fieldErrors[key] = msgs[0];
+          }
+        }
+        setErrors((prev) => ({ ...prev, ...fieldErrors }));
+        const firstErr = Object.values(fieldErrors)[0];
+        setServerError(firstErr || respData.message || "Gagal mendaftar. Silakan coba lagi.");
+      } else if (respData?.message) {
+        setServerError(respData.message);
       } else {
         setServerError("Gagal mendaftar. Silakan coba lagi.");
       }
