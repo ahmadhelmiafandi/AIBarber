@@ -144,16 +144,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      </head>
       <body
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased bg-slate-950 text-slate-50 min-h-screen`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <QueryProvider>
           <AuthProvider>{children}</AuthProvider>
         </QueryProvider>
