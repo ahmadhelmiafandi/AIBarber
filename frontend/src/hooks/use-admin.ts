@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
-import { ApiResponse, Barber, Hairstyle, User, Booking, Service, PaginationMeta } from '@/types/api';
+import { ApiResponse, Barber, Hairstyle, User, Booking, Service, PaginationMeta, Branch, Queue } from '@/types/api';
 
 export interface AiRuleItem {
   id: string;
@@ -299,5 +299,18 @@ export function useAdminBranchQueues(branchId: string) {
     },
     enabled: !!branchId,
     refetchInterval: 5000,
+  });
+}
+
+export function useSaveAiPromptMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { key: string; name: string; prompt_text: string }) => {
+      const res = await apiClient.post<ApiResponse<AiPromptItem>>('/admin/ai-prompts', payload);
+      return res.data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-ai-prompts'] });
+    },
   });
 }
