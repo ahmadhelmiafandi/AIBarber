@@ -68,6 +68,7 @@ export interface Service {
   name: string;
   estimated_duration_minutes: number;
   price: number;
+  description?: string | null;
   is_active: boolean;
 }
 

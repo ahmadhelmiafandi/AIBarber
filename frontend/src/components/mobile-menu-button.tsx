@@ -8,6 +8,7 @@ const navLinks = [
   { label: "Fitur AI", href: "#features" },
   { label: "Cara Kerja", href: "#how-it-works" },
   { label: "Portofolio", href: "#portfolio" },
+  { label: "Blog & Artikel", href: "#blog" },
   { label: "Statistik", href: "#stats" },
   { label: "Testimoni", href: "#testimonials" },
 ]

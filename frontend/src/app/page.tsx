@@ -16,12 +16,14 @@ import {
   Scissors,
   ArrowRight,
   CheckCircle2,
+  BookOpen,
 } from "lucide-react";
 
 const navLinks = [
   { label: "Fitur AI", href: "#features" },
   { label: "Cara Kerja", href: "#how-it-works" },
   { label: "Portofolio", href: "#portfolio" },
+  { label: "Blog & Artikel", href: "#blog" },
   { label: "Statistik", href: "#stats" },
   { label: "Testimoni", href: "#testimonials" },
 ];
@@ -658,6 +660,112 @@ function Footer() {
   );
 }
 
+const blogPosts = [
+  {
+    id: "1",
+    title: "5 Panduan Memilih Potongan Rambut Sesuai Bentuk Wajah Pria 2026",
+    category: "Tips Perawatan",
+    author: "Tim Master Barber",
+    date: "10 Ags 2026",
+    readTime: "4 mnt baca",
+    image: "/images/hairstyles/classic_side_part.png",
+    snippet: "Pahami bentuk rahang dan proporsi wajahmu sebelum memilih gaya rambut agar tampil makin berkarisma dan percaya diri.",
+  },
+  {
+    id: "2",
+    title: "Bagaimana AI Membantu Menemukan Gaya Rambut Paling Presisi",
+    category: "Teknologi AI",
+    author: "AI Consultant Lead",
+    date: "08 Ags 2026",
+    readTime: "3 mnt baca",
+    image: "/images/hairstyles/textured_crop_fade.png",
+    snippet: "Teknologi computer vision menganalisis 12 titik kontur wajah untuk memberikan rekomendasi gaya rambut tanpa spekulasi.",
+  },
+  {
+    id: "3",
+    title: "Rahasia Perawatan Textured Crop Fade Agar Tetap Rapi Sepanjang Hari",
+    category: "Grooming Guide",
+    author: "Fadli Master Barber",
+    date: "05 Ags 2026",
+    readTime: "5 mnt baca",
+    image: "/images/hairstyles/taper_fade_pompadour.png",
+    snippet: "Penggunaan clay pomade yang tepat dan teknik pengeringan rambut untuk mempertahankan tekstur volume dan ketegasan fade.",
+  },
+];
+
+function BlogSection() {
+  return (
+    <section id="blog" className="py-20 md:py-28 bg-muted/10 border-t border-border">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Edukasi & Tips Grooming</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+            Blog & Artikel Terkini
+          </h2>
+          <p className="mt-3 text-muted-foreground max-w-[540px] mx-auto text-sm sm:text-base">
+            Inspirasi gaya rambut pria modern, panduan grooming profesional, dan perkembangan teknologi AI barbershop.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {blogPosts.map((post) => (
+            <article
+              key={post.id}
+              className="group rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className="h-48 relative overflow-hidden bg-slate-900">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute top-3 left-3">
+                  <span className="text-[10px] font-semibold text-white px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10">
+                    {post.category}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-primary" />
+                      {post.date}
+                    </span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-amber-500" />
+                      {post.readTime}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
+                    {post.title}
+                  </h3>
+                  <p className="mt-2 text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                    {post.snippet}
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-border/60 flex items-center justify-between">
+                  <span className="text-xs font-medium text-foreground">{post.author}</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary group-hover:translate-x-0.5 transition-transform">
+                    Baca Artikel <ArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
@@ -667,6 +775,7 @@ export default function Home() {
       <Timeline />
       <Portfolio />
       <Features />
+      <BlogSection />
       <Testimonials />
       <CTASection />
       <Footer />
