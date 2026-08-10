@@ -101,11 +101,23 @@ export default function QueuesPage() {
                 </div>
                 <p className="mt-1 text-sm font-medium">{q.customer}</p>
                 <p className="text-xs opacity-80">{q.barber === "-" ? "Belum ditentukan" : q.barber} • {q.service}</p>
-                <div className="mt-2 flex gap-1">
-                  <Button size="sm" variant="outline" className="h-7 text-xs"><Phone className="mr-1 h-3 w-3" />Panggil</Button>
-                  <Button size="sm" variant="outline" className="h-7 text-xs"><SkipForward className="mr-1 h-3 w-3" />Lewati</Button>
-                  <Button size="sm" variant="outline" className="h-7 text-xs"><XCircle className="mr-1 h-3 w-3" />Batal</Button>
-                  <Button size="sm" variant="outline" className="h-7 text-xs"><ArrowUp className="mr-1 h-3 w-3" />Prioritas</Button>
+                <div className="mt-3 pt-2.5 border-t border-border/40 grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                  <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center">
+                    <Phone className="mr-1 h-3 w-3 shrink-0" />
+                    <span>Panggil</span>
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center">
+                    <SkipForward className="mr-1 h-3 w-3 shrink-0" />
+                    <span>Lewati</span>
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center text-destructive hover:text-destructive">
+                    <XCircle className="mr-1 h-3 w-3 shrink-0" />
+                    <span>Batal</span>
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-7 text-[11px] px-2 justify-center">
+                    <ArrowUp className="mr-1 h-3 w-3 shrink-0" />
+                    <span>Prioritas</span>
+                  </Button>
                 </div>
               </div>
             ))}
