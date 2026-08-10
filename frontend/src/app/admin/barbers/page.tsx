@@ -14,16 +14,27 @@ import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "@/components/ui/table"
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog"
-import { Plus, Pencil, Star, Loader2 } from "lucide-react"
-import { useAdminBarbers } from "@/hooks/use-admin"
+import { Plus, Pencil, Star, Loader2, Trash2 } from "lucide-react"
+import { useAdminBarbers, useCreateBarberMutation, useAdminBranches } from "@/hooks/use-admin"
+import { Barber } from "@/types/api"
 
 export default function BarbersPage() {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [dialogOpen, setDialogOpen] = useState(false)
+
+  // Dialog States
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null)
+
+  // Form State
+  const [specialization, setSpecialization] = useState("")
+  const [branchId, setBranchId] = useState("")
+  const [isActive, setIsActive] = useState(true)
 
   const { data: res, isLoading } = useAdminBarbers({
     page,
@@ -31,8 +42,31 @@ export default function BarbersPage() {
     search,
   })
 
+  const { data: branches = [] } = useAdminBranches()
+  const createMutation = useCreateBarberMutation()
+
   const barbersList = res?.data || []
   const meta = res?.meta || { current_page: 1, last_page: 1, total: 0, per_page: 10 }
+
+  const openCreateModal = () => {
+    setSpecialization("")
+    if (branches.length > 0) setBranchId(branches[0].id)
+    setIsActive(true)
+    setCreateDialogOpen(true)
+  }
+
+  const openEditModal = (b: Barber) => {
+    setSelectedBarber(b)
+    setSpecialization(b.specialization || "")
+    setBranchId(b.branch_id || "")
+    setIsActive(b.is_active ?? true)
+    setEditDialogOpen(true)
+  }
+
+  const openDeleteModal = (b: Barber) => {
+    setSelectedBarber(b)
+    setDeleteDialogOpen(true)
+  }
 
   return (
     <div className="space-y-6">
@@ -41,7 +75,7 @@ export default function BarbersPage() {
           <h1 className="text-2xl font-bold tracking-tight">Barbers</h1>
           <p className="text-sm text-muted-foreground">Kelola data barber dan spesialisasi</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={openCreateModal}>
           <Plus className="mr-2 h-4 w-4" />Tambah Barber
         </Button>
       </div>
@@ -61,7 +95,7 @@ export default function BarbersPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center p-12">
-              <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           ) : (
             <>
@@ -110,7 +144,26 @@ export default function BarbersPage() {
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="icon" className="h-8 w-8"><Pencil className="h-3.5 w-3.5" /></Button>
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                title="Edit Barber"
+                                onClick={() => openEditModal(b)}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                title="Hapus Barber"
+                                onClick={() => openDeleteModal(b)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       )
@@ -138,30 +191,74 @@ export default function BarbersPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {/* Create Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Tambah Barber</DialogTitle>
+            <DialogTitle>Tambah Barber Baru</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label>Nama Barber</Label>
-              <Input placeholder="Nama barber" />
+              <Label>Spesialisasi</Label>
+              <Input value={specialization} onChange={(e) => setSpecialization(e.target.value)} placeholder="Contoh: Fade, Pompadour, Beard Trim" />
             </div>
             <div className="grid gap-2">
               <Label>Cabang</Label>
-              <Select>
-                <SelectOption value="">Pilih cabang</SelectOption>
+              <Select value={branchId} onChange={(e) => setBranchId(e.target.value)}>
+                {branches.map((br) => (
+                  <SelectOption key={br.id} value={br.id}>{br.name}</SelectOption>
+                ))}
               </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label>Spesialisasi</Label>
-              <Input placeholder="Fade, Pompadour, dll" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
-            <Button onClick={() => setDialogOpen(false)}>Simpan</Button>
+            <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>Batal</Button>
+            <Button onClick={() => setCreateDialogOpen(false)}>Simpan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Data Barber</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Spesialisasi</Label>
+              <Input value={specialization} onChange={(e) => setSpecialization(e.target.value)} placeholder="Fade, Pompadour" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Status</Label>
+              <Select value={isActive ? "active" : "inactive"} onChange={(e) => setIsActive(e.target.value === "active")}>
+                <SelectOption value="active">Aktif</SelectOption>
+                <SelectOption value="inactive">Nonaktif</SelectOption>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Batal</Button>
+            <Button onClick={() => setEditDialogOpen(false)}>Perbarui</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <Trash2 className="h-5 w-5" />
+              Hapus Barber
+            </DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus data barber <strong>{selectedBarber?.user?.name || "ini"}</strong>?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Batal</Button>
+            <Button variant="destructive" onClick={() => setDeleteDialogOpen(false)}>Hapus</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -15,7 +15,15 @@ import {
 } from "@/components/ui/dialog"
 import { Pencil } from "lucide-react"
 
-const tiers = [
+interface MembershipTier {
+  id: number
+  name: string
+  benefits: string
+  discount: string
+  price: string
+}
+
+const initialTiers: MembershipTier[] = [
   { id: 1, name: "Bronze", benefits: "Poin reward, akses booking online", discount: "5%", price: "Gratis" },
   { id: 2, name: "Silver", benefits: "Bronze + prioritas antrian, birthday reward", discount: "10%", price: "Rp 50.000/bln" },
   { id: 3, name: "Gold", benefits: "Silver + free hair wash, eksklusif promo, personal barber", discount: "15%", price: "Rp 100.000/bln" },
@@ -28,15 +36,44 @@ const tierColor = (name: string) => {
 }
 
 export default function MembershipPage() {
-  const [membership] = useState(tiers)
+  const [membership, setMembership] = useState<MembershipTier[]>(initialTiers)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedTier, setSelectedTier] = useState<MembershipTier | null>(null)
+
+  // Form State
+  const [name, setName] = useState("")
+  const [benefits, setBenefits] = useState("")
+  const [discount, setDiscount] = useState("")
+  const [price, setPrice] = useState("")
+
+  const openEditModal = (t: MembershipTier) => {
+    setSelectedTier(t)
+    setName(t.name)
+    setBenefits(t.benefits)
+    setDiscount(t.discount)
+    setPrice(t.price)
+    setDialogOpen(true)
+  }
+
+  const handleSave = () => {
+    if (!selectedTier) return
+    setMembership((prev) =>
+      prev.map((item) =>
+        item.id === selectedTier.id
+          ? { ...item, name, benefits, discount, price }
+          : item
+      )
+    )
+    setDialogOpen(false)
+    setSelectedTier(null)
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Membership</h1>
-          <p className="text-sm text-muted-foreground">Kelola tier membership</p>
+          <p className="text-sm text-muted-foreground">Kelola tier membership dan hak istimewa</p>
         </div>
       </div>
 
@@ -62,7 +99,13 @@ export default function MembershipPage() {
                   <TableCell className="font-medium">{m.discount}</TableCell>
                   <TableCell>{m.price}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDialogOpen(true)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                      title="Edit Tier Membership"
+                      onClick={() => openEditModal(m)}
+                    >
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
                   </TableCell>
@@ -76,29 +119,29 @@ export default function MembershipPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Membership Tier</DialogTitle>
+            <DialogTitle>Edit Membership Tier ({selectedTier?.name})</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label>Nama Tier</Label>
-              <Input placeholder="Gold" />
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Gold" />
             </div>
             <div className="grid gap-2">
               <Label>Benefits</Label>
-              <Textarea placeholder="Deskripsi benefit" />
+              <Textarea value={benefits} onChange={(e) => setBenefits(e.target.value)} placeholder="Deskripsi benefit" />
             </div>
             <div className="grid gap-2">
               <Label>Diskon (%)</Label>
-              <Input placeholder="15" />
+              <Input value={discount} onChange={(e) => setDiscount(e.target.value)} placeholder="15%" />
             </div>
             <div className="grid gap-2">
               <Label>Harga</Label>
-              <Input placeholder="Rp 100.000/bln" />
+              <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Rp 100.000/bln" />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
-            <Button onClick={() => setDialogOpen(false)}>Simpan</Button>
+            <Button onClick={handleSave}>Simpan Perubahan</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
