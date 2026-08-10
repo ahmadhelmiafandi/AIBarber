@@ -17,20 +17,19 @@ class HealthController extends Controller
         $dbStatus = 'failed';
         $redisStatus = 'failed';
 
+        $dbError = null;
         try {
             DB::connection()->getPdo();
             $dbStatus = 'ok';
         } catch (\Throwable $e) {
-            // Logged internally without exposing exception details to output
+            $dbError = $e->getMessage();
             report($e);
         }
 
         try {
-            // Simple ping to verify Redis connectivity
             Redis::ping();
             $redisStatus = 'ok';
         } catch (\Throwable $e) {
-            // Graceful fallback / report if Redis unavailable
             report($e);
         }
 
@@ -44,6 +43,8 @@ class HealthController extends Controller
                 'database' => $dbStatus,
                 'redis' => $redisStatus,
             ],
+            'db_error' => $dbError,
+            'db_connection' => config('database.default'),
             'timestamp' => now()->toIso8601String(),
         ], $statusCode);
     }
