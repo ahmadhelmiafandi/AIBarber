@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MobileMenuButton from "@/components/mobile-menu-button";
 import {
   Camera,
   ScanFace,
@@ -208,9 +209,7 @@ function Navbar() {
             Pesan Sekarang
           </Link>
         </div>
-        <button className="md:hidden text-foreground" aria-label="Menu">
-          <Menu className="w-5 h-5" />
-        </button>
+        <MobileMenuButton />
       </div>
     </nav>
   );
@@ -226,7 +225,7 @@ function Hero() {
         </div>
 
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] lg:leading-[1.1] font-extrabold tracking-tight text-foreground max-w-[880px] mx-auto">
-          Barbershop AI #1 Jakarta — Temukan Gaya Rambut Pas Sesuai Karakter Wajahmu
+          Gaya Rambut Presisi, Dipilihkan AI Khusus Untuk Wajahmu
         </h1>
         <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-[620px] mx-auto leading-relaxed">
           Konsultasi berbasis AI untuk rekomendasi potongan rambut presisi, lengkap dengan booking antrean online dan preview gaya secara real-time.
@@ -651,7 +650,7 @@ function Footer() {
             </div>
             <span>MyBarber</span>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground" suppressHydrationWarning>
             &copy; {new Date().getFullYear()} MyBarber. All rights reserved.
           </p>
         </div>
