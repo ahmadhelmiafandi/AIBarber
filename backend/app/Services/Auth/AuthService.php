@@ -28,7 +28,11 @@ class AuthService
             // Ignore if role system offline
         }
 
-        event(new Registered($user));
+        try {
+            event(new Registered($user));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Verification email failed to send on register: ' . $e->getMessage());
+        }
 
         return [
             'token' => $user->createToken('api-token')->plainTextToken,
