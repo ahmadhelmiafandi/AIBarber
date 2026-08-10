@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
-import { ApiResponse, Barber, Branch, Service, Hairstyle } from '@/types/api';
+import { ApiResponse, Barber, Hairstyle } from '@/types/api';
 
 export interface AiRuleItem {
   id: string;
