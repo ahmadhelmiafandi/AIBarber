@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
-import { Crown, Check, Star } from "lucide-react"
+import { Crown, Check, Star, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useCustomerMembership } from "@/hooks/use-customer"
 
 const tiers = [
   {
@@ -54,6 +55,13 @@ const tiers = [
 ]
 
 export default function MembershipPage() {
+  const { data: apiMembership, isLoading } = useCustomerMembership()
+
+  const currentTier = apiMembership?.tier || "Silver"
+  const currentPoints = apiMembership?.points || 1250
+  const maxPoints = 2000
+  const pointsNeeded = Math.max(0, maxPoints - currentPoints)
+
   return (
     <div className="space-y-8">
       <Card>
@@ -64,21 +72,27 @@ export default function MembershipPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-lg font-semibold">Silver Member</p>
-                <Badge>Aktif</Badge>
+                <p className="text-lg font-semibold">{currentTier} Member</p>
+                <Badge>{apiMembership?.status === "active" ? "Aktif" : "Aktif"}</Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                Berlaku hingga 15 Agustus 2026
+                {apiMembership?.valid_until ? `Berlaku hingga ${new Date(apiMembership.valid_until).toLocaleDateString("id-ID")}` : "Berlaku hingga 15 Agustus 2026"}
               </p>
             </div>
           </div>
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Poin Reward</span>
-              <span className="font-medium">1.250 / 2.000</span>
-            </div>
-            <Progress value={1250} max={2000} className="w-full sm:w-48" />
-            <p className="text-xs text-muted-foreground">750 poin lagi ke Gold</p>
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin text-amber-500" />
+            ) : (
+              <>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Poin Reward</span>
+                  <span className="font-medium">{currentPoints.toLocaleString("id-ID")} / {maxPoints.toLocaleString("id-ID")}</span>
+                </div>
+                <Progress value={currentPoints} max={maxPoints} className="w-full sm:w-48" />
+                <p className="text-xs text-muted-foreground">{pointsNeeded} poin lagi ke Gold</p>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -123,7 +137,7 @@ export default function MembershipPage() {
                   className="w-full"
                   variant={tier.highlight ? "default" : "outline"}
                 >
-                  {tier.name === "Silver" ? "Paket Aktif" : "Pilih Paket"}
+                  {tier.name === currentTier ? "Paket Aktif" : "Pilih Paket"}
                 </Button>
               </CardContent>
             </Card>

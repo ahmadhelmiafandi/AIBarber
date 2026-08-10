@@ -5,11 +5,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Star, MapPin, Calendar, Clock } from "lucide-react"
+import { Star, MapPin, Calendar, Clock, Loader2 } from "lucide-react"
+import { useCustomerBookingsHistory } from "@/hooks/use-customer"
 
-const historyData = [
+const historyDataFallback = [
   {
-    id: 1,
+    id: "1",
     name: "Textured Crop",
     date: "15 Jul 2026",
     barber: "Mas Dika",
@@ -18,7 +19,7 @@ const historyData = [
     duration: "35 menit",
   },
   {
-    id: 2,
+    id: "2",
     name: "Buzz Cut Fade",
     date: "28 Jun 2026",
     barber: "Mas Ari",
@@ -26,55 +27,32 @@ const historyData = [
     rating: 4,
     duration: "25 menit",
   },
-  {
-    id: 3,
-    name: "Pompadour Classic",
-    date: "10 Jun 2026",
-    barber: "Mas Dika",
-    branch: "Cabang Kemang",
-    rating: 5,
-    duration: "40 menit",
-  },
-  {
-    id: 4,
-    name: "Side Part",
-    date: "22 Mei 2026",
-    barber: "Mas Rizal",
-    branch: "Cabang Sudirman",
-    rating: 4,
-    duration: "30 menit",
-  },
-  {
-    id: 5,
-    name: "Undercut",
-    date: "5 Mei 2026",
-    barber: "Mas Dika",
-    branch: "Cabang Kemang",
-    rating: 5,
-    duration: "35 menit",
-  },
-  {
-    id: 6,
-    name: "French Crop",
-    date: "18 Apr 2026",
-    barber: "Mas Ari",
-    branch: "Cabang Senopati",
-    rating: 4,
-    duration: "30 menit",
-  },
 ]
 
 export default function HistoryPage() {
+  const { data: apiBookings, isLoading } = useCustomerBookingsHistory()
   const [filter, setFilter] = useState("semua")
+
+  const historyList = apiBookings && apiBookings.length > 0
+    ? apiBookings.map((b) => ({
+        id: b.id,
+        name: b.service?.name || "Layanan Haircut",
+        date: b.booking_date,
+        barber: b.barber?.user?.name || "Barber",
+        branch: b.branch?.name || "Cabang Utama",
+        rating: 5,
+        duration: `${b.service?.estimated_duration_minutes || 30} menit`,
+      }))
+    : historyDataFallback
 
   const filtered =
     filter === "semua"
-      ? historyData
+      ? historyList
       : filter === "1bulan"
-        ? historyData.slice(0, 2)
+        ? historyList.slice(0, 1)
         : filter === "3bulan"
-          ? historyData.slice(0, 4)
-          : historyData
+          ? historyList.slice(0, 3)
+          : historyList
 
   return (
     <div className="space-y-6">
@@ -87,7 +65,11 @@ export default function HistoryPage() {
         </TabsList>
       </Tabs>
 
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center p-16">
+          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+        </div>
+      ) : filtered.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-16 text-center">
             <Clock className="h-12 w-12 text-muted-foreground" />
@@ -135,7 +117,7 @@ export default function HistoryPage() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-6 w-6">
                       <AvatarFallback className="text-[10px]">
-                        {item.barber.split(" ")[1]?.[0] || item.barber[0]}
+                        {item.barber.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-sm text-muted-foreground">{item.barber}</span>

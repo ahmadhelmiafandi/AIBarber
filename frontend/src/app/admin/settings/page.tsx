@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const [name, setName] = useState("Admin Barbershop");
   const [email, setEmail] = useState("admin@aibarber.com");
   const [saved, setSaved] = useState(false);
+
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <div className="space-y-8">
@@ -47,15 +52,54 @@ export default function AdminSettingsPage() {
         <div className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Password Lama</label>
-            <input type="password" className="w-full rounded-[12px] border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+            <div className="relative">
+              <input
+                type={showOldPassword ? "text" : "password"}
+                className="w-full rounded-[12px] border border-input bg-background pl-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                type="button"
+                onClick={() => setShowOldPassword(!showOldPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                aria-label={showOldPassword ? "Sembunyikan Password" : "Tampilkan Password"}
+              >
+                {showOldPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Password Baru</label>
-            <input type="password" className="w-full rounded-[12px] border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+            <div className="relative">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                className="w-full rounded-[12px] border border-input bg-background pl-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                aria-label={showNewPassword ? "Sembunyikan Password" : "Tampilkan Password"}
+              >
+                {showNewPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Konfirmasi Password</label>
-            <input type="password" className="w-full rounded-[12px] border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                className="w-full rounded-[12px] border border-input bg-background pl-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                aria-label={showConfirmPassword ? "Sembunyikan Password" : "Tampilkan Password"}
+              >
+                {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
           </div>
         </div>
         <button className="rounded-[14px] bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity">

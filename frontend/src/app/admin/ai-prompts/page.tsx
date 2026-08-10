@@ -1,45 +1,63 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Save, Info } from "lucide-react"
+import { Save, Info, Loader2 } from "lucide-react"
+import { useAdminAiPrompts, useSaveAiPromptMutation } from "@/hooks/use-admin"
 
-const initialPrompts = [
+const defaultPromptsFallback = [
   {
-    id: "system",
-    title: "System Prompt",
+    id: "system_consultant",
+    key: "system_consultant",
+    title: "System Consultant Prompt",
     description: "Prompt utama untuk persona AI barbershop",
-    value: `Kamu adalah AI Smart Barbershop Assistant. Kamu membantu pelanggan memilih gaya rambut yang cocok berdasarkan bentuk wajah, preferensi, dan gaya hidup mereka. Selalu ramah, profesional, dan memberikan rekomendasi yang personal. Gunakan bahasa Indonesia yang santai tapi sopan.`,
+    value: `Kamu adalah AI Smart Barbershop Assistant. Kamu membantu pelanggan memilih gaya rambut yang cocok berdasarkan bentuk wajah, preferensi, dan gaya hidup mereka.`,
   },
   {
-    id: "chat",
-    title: "Chat Prompt",
-    description: "Prompt untuk percakapan umum dengan pelanggan",
-    value: `Ketika pelanggan bertanya tentang layanan, harga, atau jadwal, berikan informasi yang akurat berdasarkan data yang tersedia. Jika tidak yakin, arahkan pelanggan untuk menghubungi cabang terdekat. Selalu tawarkan untuk membantu booking atau konsultasi gaya rambut.`,
-  },
-  {
-    id: "recommendation",
-    title: "Recommendation Prompt",
-    description: "Prompt untuk rekomendasi gaya rambut AI",
-    value: `Analisis bentuk wajah pelanggan dari foto yang diberikan. Identifikasi bentuk wajah (oval, round, square, heart, oblong). Berdasarkan bentuk wajah, berikan 3-5 rekomendasi gaya rambut yang cocok beserta alasannya. Pertimbangkan juga tekstur rambut, tingkat maintenance, dan gaya hidup pelanggan. Format output: nama gaya rambut, skor kesesuaian (1-100), dan penjelasan singkat.`,
-  },
-  {
-    id: "image-editing",
-    title: "Image Editing Prompt",
-    description: "Prompt untuk virtual try-on / preview gaya rambut",
-    value: `Generate a realistic preview of the selected hairstyle applied to the customer's photo. Maintain the customer's facial features, skin tone, and overall appearance. Only modify the hair to match the selected hairstyle. Ensure natural blending between the new hairstyle and the face. Output should be photorealistic and high quality.`,
+    id: "recommendation_reason",
+    key: "recommendation_reason",
+    title: "Recommendation Reason Prompt",
+    description: "Prompt untuk rekomendasi alasan penyesuaian gaya rambut",
+    value: `Generate a concise 1-2 sentence recommendation reason in Indonesian explaining why the haircut suits a customer...`,
   },
 ]
 
 export default function AIPromptsPage() {
-  const [prompts, setPrompts] = useState(initialPrompts)
+  const { data: apiPrompts, isLoading } = useAdminAiPrompts()
+  const savePromptMutation = useSaveAiPromptMutation()
+  const [promptsMap, setPromptsMap] = useState<Record<string, string>>({})
 
-  const updatePrompt = (id: string, value: string) => {
-    setPrompts((prev) => prev.map((p) => (p.id === id ? { ...p, value } : p)))
+  useEffect(() => {
+    if (apiPrompts && apiPrompts.length > 0) {
+      const map: Record<string, string> = {}
+      apiPrompts.forEach((p) => {
+        map[p.key] = p.prompt_text
+      })
+      setPromptsMap(map)
+    }
+  }, [apiPrompts])
+
+  const handleSave = async (key: string, name: string) => {
+    const text = promptsMap[key] || ""
+    if (!text) return
+    await savePromptMutation.mutateAsync({ key, name, prompt_text: text })
   }
+
+  const promptItems = apiPrompts && apiPrompts.length > 0
+    ? apiPrompts.map((p) => ({
+        id: p.id,
+        key: p.key,
+        title: p.name,
+        description: `CMS Prompt untuk ${p.key}`,
+        value: promptsMap[p.key] ?? p.prompt_text,
+      }))
+    : defaultPromptsFallback.map((p) => ({
+        ...p,
+        value: promptsMap[p.key] ?? p.value,
+      }))
 
   return (
     <div className="space-y-6">
@@ -53,33 +71,44 @@ export default function AIPromptsPage() {
         <span className="text-muted-foreground">Perubahan berlaku tanpa deploy ulang. Pastikan prompt sudah benar sebelum menyimpan.</span>
       </div>
 
-      <div className="grid gap-4">
-        {prompts.map((p) => (
-          <Card key={p.id}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">{p.title}</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-1">{p.description}</p>
+      {isLoading ? (
+        <div className="flex items-center justify-center p-12">
+          <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {promptItems.map((p) => (
+            <Card key={p.key}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base">{p.title}</CardTitle>
+                    <p className="text-xs text-muted-foreground mt-1">{p.description}</p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">{p.key}</Badge>
                 </div>
-                <Badge variant="outline" className="text-[10px]">{p.id}</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                value={p.value}
-                onChange={(e) => updatePrompt(p.id, e.target.value)}
-                className="min-h-[120px] font-mono text-sm"
-              />
-            </CardContent>
-            <CardFooter>
-              <Button size="sm">
-                <Save className="mr-2 h-3.5 w-3.5" />Simpan
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={p.value}
+                  onChange={(e) => setPromptsMap((prev) => ({ ...prev, [p.key]: e.target.value }))}
+                  className="min-h-[120px] font-mono text-sm"
+                />
+              </CardContent>
+              <CardFooter>
+                <Button
+                  size="sm"
+                  disabled={savePromptMutation.isPending}
+                  onClick={() => handleSave(p.key, p.title)}
+                >
+                  <Save className="mr-2 h-3.5 w-3.5" />
+                  {savePromptMutation.isPending ? "Menyimpan..." : "Simpan"}
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

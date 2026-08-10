@@ -17,9 +17,34 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('auth_user');
+      if (storedUser) {
+        try {
+          return JSON.parse(storedUser);
+        } catch {
+          return null;
+        }
+      }
+    }
+    return null;
+  });
+
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('auth_token');
+    }
+    return null;
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return !localStorage.getItem('auth_token');
+    }
+    return true;
+  });
+
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -29,8 +54,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
         return;
       }
-
-      setToken(storedToken);
 
       try {
         const response = await apiClient.get<ApiResponse<User>>('/auth/me');

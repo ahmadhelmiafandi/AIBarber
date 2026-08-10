@@ -3,7 +3,7 @@
 import { useState, Suspense, type FormEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
+import { Lock, ArrowLeft, CheckCircle2, Loader2, Eye, EyeOff } from "lucide-react";
 import apiClient from "@/lib/api-client";
 
 function ResetPasswordForm() {
@@ -15,6 +15,8 @@ function ResetPasswordForm() {
 
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -108,13 +110,25 @@ function ResetPasswordForm() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   disabled={loading}
-                  className="w-full h-11 pl-10 pr-4 rounded-[14px] border border-input bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow disabled:opacity-50"
+                  className="w-full h-11 pl-10 pr-10 rounded-[14px] border border-input bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow disabled:opacity-50"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  aria-label={showPassword ? "Sembunyikan Password" : "Tampilkan Password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </button>
               </div>
               {errors.password && (
                 <p className="text-destructive text-xs mt-1">{errors.password}</p>
@@ -128,13 +142,25 @@ function ResetPasswordForm() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <input
-                  type="password"
+                  type={showPasswordConfirmation ? "text" : "password"}
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
                   placeholder="••••••••"
                   disabled={loading}
-                  className="w-full h-11 pl-10 pr-4 rounded-[14px] border border-input bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow disabled:opacity-50"
+                  className="w-full h-11 pl-10 pr-10 rounded-[14px] border border-input bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow disabled:opacity-50"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  aria-label={showPasswordConfirmation ? "Sembunyikan Password" : "Tampilkan Password"}
+                >
+                  {showPasswordConfirmation ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </button>
               </div>
               {errors.password_confirmation && (
                 <p className="text-destructive text-xs mt-1">{errors.password_confirmation}</p>

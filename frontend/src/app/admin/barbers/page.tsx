@@ -14,18 +14,31 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog"
-import { Plus, Pencil, Star } from "lucide-react"
+import { Plus, Pencil, Star, Loader2 } from "lucide-react"
+import { useAdminBarbers } from "@/hooks/use-admin"
 
-const initialBarbers = [
-  { id: 1, name: "Rafi Adriansyah", branch: "Cabang Kemang", specialization: "Fade, Pompadour", rating: 4.9, status: "Aktif", initials: "RA" },
-  { id: 2, name: "Gilang Pratama", branch: "Cabang Menteng", specialization: "Undercut, Buzz Cut", rating: 4.7, status: "Aktif", initials: "GP" },
-  { id: 3, name: "Hendra Kurniawan", branch: "Cabang Kemang", specialization: "Classic, Taper", rating: 4.8, status: "Aktif", initials: "HK" },
-  { id: 4, name: "Irfan Maulana", branch: "Cabang BSD", specialization: "Mullet, Textured Crop", rating: 4.5, status: "Cuti", initials: "IM" },
+const initialBarbersFallback = [
+  { id: "1", name: "Rafi Adriansyah", branch: "Cabang Kemang", specialization: "Fade, Pompadour", rating: 4.9, status: "Aktif", initials: "RA" },
+  { id: "2", name: "Gilang Pratama", branch: "Cabang Menteng", specialization: "Undercut, Buzz Cut", rating: 4.7, status: "Aktif", initials: "GP" },
+  { id: "3", name: "Hendra Kurniawan", branch: "Cabang Kemang", specialization: "Classic, Taper", rating: 4.8, status: "Aktif", initials: "HK" },
+  { id: "4", name: "Irfan Maulana", branch: "Cabang BSD", specialization: "Mullet, Textured Crop", rating: 4.5, status: "Cuti", initials: "IM" },
 ]
 
 export default function BarbersPage() {
-  const [barbers] = useState(initialBarbers)
+  const { data: apiBarbers, isLoading } = useAdminBarbers()
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  const barbersList = apiBarbers && apiBarbers.length > 0
+    ? apiBarbers.map((b) => ({
+        id: b.id,
+        name: b.user?.name || "Barber",
+        branch: b.branch?.name || "Cabang Utama",
+        specialization: b.specialization || "General Haircut",
+        rating: b.rating || 4.8,
+        status: b.status || "Aktif",
+        initials: (b.user?.name || "BA").substring(0, 2).toUpperCase(),
+      }))
+    : initialBarbersFallback
 
   return (
     <div className="space-y-6">
@@ -41,45 +54,51 @@ export default function BarbersPage() {
 
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Foto</TableHead>
-                <TableHead>Nama</TableHead>
-                <TableHead>Cabang</TableHead>
-                <TableHead>Spesialisasi</TableHead>
-                <TableHead>Rating</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {barbers.map((b) => (
-                <TableRow key={b.id}>
-                  <TableCell>
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="text-[10px]">{b.initials}</AvatarFallback>
-                    </Avatar>
-                  </TableCell>
-                  <TableCell className="font-medium">{b.name}</TableCell>
-                  <TableCell>{b.branch}</TableCell>
-                  <TableCell className="text-muted-foreground">{b.specialization}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3.5 w-3.5 fill-warning text-warning" />
-                      {b.rating}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={b.status === "Aktif" ? "success" : "warning"}>{b.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" className="h-8 w-8"><Pencil className="h-3.5 w-3.5" /></Button>
-                  </TableCell>
+          {isLoading ? (
+            <div className="flex items-center justify-center p-12">
+              <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Foto</TableHead>
+                  <TableHead>Nama</TableHead>
+                  <TableHead>Cabang</TableHead>
+                  <TableHead>Spesialisasi</TableHead>
+                  <TableHead>Rating</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {barbersList.map((b) => (
+                  <TableRow key={b.id}>
+                    <TableCell>
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-[10px]">{b.initials}</AvatarFallback>
+                      </Avatar>
+                    </TableCell>
+                    <TableCell className="font-medium">{b.name}</TableCell>
+                    <TableCell>{b.branch}</TableCell>
+                    <TableCell className="text-muted-foreground">{b.specialization}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Star className="h-3.5 w-3.5 fill-warning text-warning" />
+                        {b.rating}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={b.status === "Aktif" ? "success" : "warning"}>{b.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" className="h-8 w-8"><Pencil className="h-3.5 w-3.5" /></Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 

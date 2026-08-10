@@ -1,67 +1,52 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Heart, Scissors, Droplets } from "lucide-react"
+import { Heart, Scissors, Droplets, Loader2 } from "lucide-react"
+import { useCustomerFavorites, useToggleFavoriteMutation } from "@/hooks/use-customer"
 
-const initialFavorites = [
-  {
-    id: 1,
-    name: "Textured Crop",
-    category: "Modern",
-    match: 95,
-    maintenance: "Rendah",
-  },
-  {
-    id: 2,
-    name: "Undercut",
-    category: "Klasik Modern",
-    match: 92,
-    maintenance: "Sedang",
-  },
-  {
-    id: 3,
-    name: "Pompadour",
-    category: "Klasik",
-    match: 88,
-    maintenance: "Tinggi",
-  },
-  {
-    id: 4,
-    name: "Buzz Cut Fade",
-    category: "Minimalis",
-    match: 85,
-    maintenance: "Rendah",
-  },
-  {
-    id: 5,
-    name: "Side Part",
-    category: "Klasik",
-    match: 82,
-    maintenance: "Sedang",
-  },
-  {
-    id: 6,
-    name: "French Crop",
-    category: "Modern",
-    match: 80,
-    maintenance: "Rendah",
-  },
+const initialFavoritesFallback = [
+  { id: "1", hairstyle_id: "h1", name: "Textured Crop", category: "Modern", match: 95, maintenance: "Rendah" },
+  { id: "2", hairstyle_id: "h2", name: "Undercut", category: "Klasik Modern", match: 92, maintenance: "Sedang" },
+  { id: "3", hairstyle_id: "h3", name: "Pompadour", category: "Klasik", match: 88, maintenance: "Tinggi" },
 ]
 
-const maintenanceColor: Record<string, string> = {
+const maintenanceColor: Record<string, "success" | "warning" | "destructive"> = {
   Rendah: "success",
   Sedang: "warning",
   Tinggi: "destructive",
-} as const
+}
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState(initialFavorites)
+  const { data: apiFavorites, isLoading } = useCustomerFavorites()
+  const toggleMutation = useToggleFavoriteMutation()
 
-  const removeFavorite = (id: number) => {
-    setFavorites((prev) => prev.filter((f) => f.id !== id))
+  const favorites = apiFavorites && apiFavorites.length > 0
+    ? apiFavorites.map((f) => ({
+        id: f.id,
+        hairstyle_id: f.hairstyle_id,
+        name: f.hairstyle?.name || "Hairstyle Favorit",
+        category: f.hairstyle?.category || "Style Pria",
+        match: 90,
+        maintenance: f.hairstyle?.maintenance_level || "Sedang",
+      }))
+    : initialFavoritesFallback
+
+  const removeFavorite = async (hairstyleId: string) => {
+    try {
+      await toggleMutation.mutateAsync(hairstyleId)
+    } catch {
+      // Handled by query invalidation
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-16">
+        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+      </div>
+    )
   }
 
   if (favorites.length === 0) {
@@ -93,7 +78,8 @@ export default function FavoritesPage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 shrink-0"
-                onClick={() => removeFavorite(style.id)}
+                disabled={toggleMutation.isPending}
+                onClick={() => removeFavorite(style.hairstyle_id)}
               >
                 <Heart className="h-4 w-4 fill-destructive text-destructive" />
               </Button>
@@ -107,10 +93,7 @@ export default function FavoritesPage() {
                 <Droplets className="h-3.5 w-3.5 text-muted-foreground" />
                 <Badge
                   variant={
-                    maintenanceColor[style.maintenance] as
-                      | "success"
-                      | "warning"
-                      | "destructive"
+                    maintenanceColor[style.maintenance] || "success"
                   }
                 >
                   {style.maintenance}

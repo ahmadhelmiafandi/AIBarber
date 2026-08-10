@@ -28,24 +28,24 @@ class AdminAiRulesController extends Controller
     public function storeRule(Request $request): JsonResponse
     {
         $request->validate([
-            'rule_name' => ['required', 'string', 'max:100'],
-            'face_shape' => ['nullable', 'string', 'max:50'],
-            'hair_texture' => ['nullable', 'string', 'max:50'],
-            'hairstyle_id' => ['nullable', 'uuid', 'exists:hairstyles,id'],
-            'score_modifier' => ['required', 'integer', 'between:-50,50'],
+            'face_shape' => ['required', 'string', 'max:50'],
+            'hairstyle_id' => ['required', 'uuid', 'exists:hairstyles,id'],
+            'score_boost' => ['required', 'integer', 'between:-50,50'],
+            'prompt_template' => ['nullable', 'string'],
+            'negative_prompt' => ['nullable', 'string'],
         ]);
 
         $rule = AiRule::create([
             'id' => Str::uuid(),
-            'rule_name' => $request->input('rule_name'),
             'face_shape' => $request->input('face_shape'),
-            'hair_texture' => $request->input('hair_texture'),
             'hairstyle_id' => $request->input('hairstyle_id'),
-            'score_modifier' => $request->input('score_modifier'),
+            'score_boost' => $request->input('score_boost'),
+            'prompt_template' => $request->input('prompt_template'),
+            'negative_prompt' => $request->input('negative_prompt'),
             'is_active' => true,
         ]);
 
-        return $this->successResponse('Aturan AI CMS berhasil ditambahkan.', $rule, status: 201);
+        return $this->successResponse('Aturan AI CMS berhasil ditambahkan.', $rule->load('hairstyle'), status: 201);
     }
 
     public function updateSettings(Request $request): JsonResponse

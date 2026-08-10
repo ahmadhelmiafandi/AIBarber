@@ -134,6 +134,7 @@ export default function DashboardLayout({
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 onClick={() => setSidebarOpen(false)}
                 className={cn(
                   "flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-sm font-medium transition-colors",

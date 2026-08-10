@@ -1,18 +1,23 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AdminAiPromptsController;
 use App\Http\Controllers\Api\V1\AdminAiRulesController;
 use App\Http\Controllers\Api\V1\AiChatController;
 use App\Http\Controllers\Api\V1\AiConsultationController;
 use App\Http\Controllers\Api\V1\AiPreviewController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BarberController;
+use App\Http\Controllers\Api\V1\BlogController;
 use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\BranchController;
 use App\Http\Controllers\Api\V1\CronController;
+use App\Http\Controllers\Api\V1\CustomerFavoriteController;
 use App\Http\Controllers\Api\V1\HairstyleController;
 use App\Http\Controllers\Api\V1\HairstyleImageController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\MembershipController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\PromotionController;
 use App\Http\Controllers\Api\V1\QueueController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +54,7 @@ Route::prefix('v1')->group(function () {
 
         // Booking
         Route::post('/bookings', [BookingController::class, 'store']);
+        Route::get('/bookings', [BookingController::class, 'index']);
 
         // Queue Query & Actions
         Route::get('/queues/active', [QueueController::class, 'getActiveQueue']);
@@ -58,6 +64,15 @@ Route::prefix('v1')->group(function () {
         Route::post('/queues/{queue}/call', [QueueController::class, 'call']);
         Route::post('/queues/{queue}/start-service', [QueueController::class, 'startService']);
         Route::post('/queues/{queue}/complete-service', [QueueController::class, 'completeService']);
+
+        // Customer Favorites & Membership
+        Route::get('/favorites', [CustomerFavoriteController::class, 'index']);
+        Route::post('/favorites/toggle', [CustomerFavoriteController::class, 'toggle']);
+        Route::get('/membership', [MembershipController::class, 'show']);
+
+        // CMS Promotions & Blogs
+        Route::apiResource('promotions', PromotionController::class);
+        Route::apiResource('blogs', BlogController::class);
 
         // Notifications
         Route::get('/notifications', [NotificationController::class, 'index']);
@@ -75,5 +90,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/admin/ai-rules', [AdminAiRulesController::class, 'index']);
         Route::post('/admin/ai-rules', [AdminAiRulesController::class, 'storeRule']);
         Route::post('/admin/ai-settings', [AdminAiRulesController::class, 'updateSettings']);
+        Route::get('/admin/ai-prompts', [AdminAiPromptsController::class, 'index']);
+        Route::post('/admin/ai-prompts', [AdminAiPromptsController::class, 'store']);
     });
 });

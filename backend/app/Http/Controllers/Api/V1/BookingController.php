@@ -36,6 +36,16 @@ class BookingController extends Controller
         return $this->successResponse('Ketersediaan slot booking berhasil diambil.', $result);
     }
 
+    public function index(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $bookings = Booking::with(['branch', 'barber.user', 'service'])
+            ->where('customer_id', $request->user()->id)
+            ->latest()
+            ->get();
+
+        return $this->successResponse('Riwayat booking pengguna.', BookingResource::collection($bookings));
+    }
+
     public function store(CreateBookingRequest $request): JsonResponse
     {
         Gate::authorize('create', Booking::class);

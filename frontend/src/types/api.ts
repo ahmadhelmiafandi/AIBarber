@@ -57,8 +57,23 @@ export interface Barber {
   id: string;
   user_id: string;
   branch_id: string;
+  specialization?: string;
+  rating?: number;
+  status?: string;
   is_active: boolean;
   user?: User;
+  branch?: Branch;
+}
+
+export interface Hairstyle {
+  id: string;
+  name: string;
+  category?: string;
+  maintenance_level?: string;
+  difficulty?: string;
+  description?: string;
+  price?: number;
+  is_active?: boolean;
 }
 
 export interface Booking {
