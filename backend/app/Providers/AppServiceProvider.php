@@ -75,6 +75,54 @@ class AppServiceProvider extends ServiceProvider
         }
         config(['app.key' => $cleanKey]);
 
+        // Dynamic Railway Runtime Database Resolver (Overrides stale config cache)
+        $dbUrl = env('DB_URL') ?: env('DATABASE_URL');
+        $pgHost = env('DB_HOST') ?: env('PGHOST');
+        $mysqlHost = env('MYSQLHOST');
+        $dbConn = env('DB_CONNECTION');
+
+        if (empty($dbConn)) {
+            if (!empty($mysqlHost)) {
+                $dbConn = 'mysql';
+            } elseif (!empty($pgHost) || !empty($dbUrl)) {
+                $dbConn = 'pgsql';
+            } else {
+                $dbConn = 'sqlite';
+            }
+        }
+
+        config(['database.default' => $dbConn]);
+
+        if (!empty($dbUrl)) {
+            config(["database.connections.{$dbConn}.url" => $dbUrl]);
+        }
+        if (!empty($mysqlHost)) {
+            config([
+                'database.connections.mysql.host' => env('DB_HOST') ?: env('MYSQLHOST', '127.0.0.1'),
+                'database.connections.mysql.port' => env('DB_PORT') ?: env('MYSQLPORT', '3306'),
+                'database.connections.mysql.database' => env('DB_DATABASE') ?: env('MYSQLDATABASE', 'laravel'),
+                'database.connections.mysql.username' => env('DB_USERNAME') ?: env('MYSQLUSER', 'root'),
+                'database.connections.mysql.password' => env('DB_PASSWORD') ?: env('MYSQLPASSWORD', ''),
+            ]);
+        }
+        if (!empty($pgHost)) {
+            config([
+                'database.connections.pgsql.host' => $pgHost,
+                'database.connections.pgsql.port' => env('DB_PORT') ?: env('PGPORT', '5432'),
+                'database.connections.pgsql.database' => env('DB_DATABASE') ?: env('PGDATABASE', 'postgres'),
+                'database.connections.pgsql.username' => env('DB_USERNAME') ?: env('PGUSER', 'postgres'),
+                'database.connections.pgsql.password' => env('DB_PASSWORD') ?: env('PGPASSWORD', ''),
+            ]);
+        }
+        if ($dbConn === 'sqlite') {
+            $sqlitePath = env('DB_DATABASE') ?: database_path('database.sqlite');
+            if (!file_exists($sqlitePath) && str_contains($sqlitePath, '.sqlite')) {
+                @mkdir(dirname($sqlitePath), 0755, true);
+                @touch($sqlitePath);
+            }
+            config(['database.connections.sqlite.database' => $sqlitePath]);
+        }
+
         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
             $frontendUrl = env('FRONTEND_URL') ?: config('app.frontend_url');
             
