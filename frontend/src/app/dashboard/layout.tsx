@@ -52,6 +52,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
+  const [mounted, setMounted] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
@@ -60,17 +61,21 @@ export default function DashboardLayout({
   const pageTitle = pageTitles[pathname] || "Dashboard"
 
   useEffect(() => {
-    if (!isLoading && !token) {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && !isLoading && !token) {
       router.push("/auth/login")
     }
-  }, [isLoading, token, router])
+  }, [mounted, isLoading, token, router])
 
   const handleLogout = async () => {
     await logout()
     router.push("/auth/login")
   }
 
-  if (isLoading) {
+  if (!mounted || isLoading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
