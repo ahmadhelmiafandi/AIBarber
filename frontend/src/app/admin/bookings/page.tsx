@@ -32,7 +32,7 @@ const statusVariant: Record<string, "secondary" | "default" | "warning" | "succe
 }
 
 export default function BookingsPage() {
-  const [tab, setTab] = useState<string>("Semua")
+  const [tab, setTab] = useState<BookingStatus>("Semua")
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
@@ -57,7 +57,7 @@ export default function BookingsPage() {
       </div>
 
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <Tabs value={tab} onValueChange={(val) => { setTab(val); setPage(1); }} className="w-full md:w-auto">
+        <Tabs value={tab} onValueChange={(val) => { setTab(val as BookingStatus); setPage(1); }} className="w-full md:w-auto">
           <TabsList className="flex flex-wrap h-auto">
             <TabsTrigger value="Semua">Semua</TabsTrigger>
             <TabsTrigger value="pending">Menunggu</TabsTrigger>

@@ -94,7 +94,7 @@ export default function ServicesPage() {
                         <TableCell>{formatRp(s.price)}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className="font-mono">
-                            {s.estimated_duration_minutes || s.duration || 30} menit
+                            {s.estimated_duration_minutes || 30} menit
                           </Badge>
                         </TableCell>
                         <TableCell>

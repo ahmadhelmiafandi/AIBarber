@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
-import { ApiResponse, Barber, Hairstyle, User, Booking, PaginationMeta } from '@/types/api';
+import { ApiResponse, Barber, Hairstyle, User, Booking, Service, PaginationMeta } from '@/types/api';
 
 export interface AiRuleItem {
   id: string;
@@ -135,7 +135,7 @@ export function useAdminServices(params: FetchQueryParams = {}) {
   return useQuery({
     queryKey: ['admin-services', page, perPage, search],
     queryFn: async () => {
-      const res = await apiClient.get<ApiResponse<any[]>>('/services', {
+      const res = await apiClient.get<ApiResponse<Service[]>>('/services', {
         params: { page, per_page: perPage, search },
       });
       return {
