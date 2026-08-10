@@ -38,13 +38,11 @@ class HealthController extends Controller
 
         return response()->json([
             'status' => $isHealthy ? 'healthy' : 'unhealthy',
-            'deployment_profile' => env('DEPLOYMENT_PROFILE', 'demo'),
+            'deployment_profile' => config('app.deployment_profile', env('DEPLOYMENT_PROFILE', 'demo')),
             'checks' => [
                 'database' => $dbStatus,
                 'redis' => $redisStatus,
             ],
-            'db_error' => $dbError,
-            'db_connection' => config('database.default'),
             'timestamp' => now()->toIso8601String(),
         ], $statusCode);
     }
