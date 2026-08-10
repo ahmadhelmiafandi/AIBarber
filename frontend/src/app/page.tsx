@@ -299,31 +299,29 @@ function Hero() {
 
             {/* Card 2: Hairstyle Preview */}
             <div className="group rounded-xl overflow-hidden border border-border bg-card flex flex-col justify-between shadow-sm">
-              <div className="h-40 relative overflow-hidden bg-slate-900">
+              <div className="h-52 relative overflow-hidden bg-slate-900">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/hairstyles/textured_crop_fade.png"
                   alt="Textured Crop Fade"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent flex flex-col justify-between p-3">
-                  <div className="flex justify-between items-start">
-                    <span className="text-[10px] font-semibold text-amber-300 px-2 py-0.5 rounded bg-amber-950/80 backdrop-blur-sm border border-amber-500/30">
-                      Rekomendasi Utama
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-white">
-                      Textured Crop Fade
-                    </h3>
-                  </div>
+                <div className="absolute top-3 left-3">
+                  <span className="text-[10px] font-semibold text-amber-300 px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-amber-500/30">
+                    Rekomendasi Utama
+                  </span>
                 </div>
               </div>
 
-              <div className="p-3.5 flex-1 flex flex-col justify-between space-y-3">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Estimasi Pengerjaan:</span>
-                  <span className="font-medium text-foreground">35 Menit</span>
+              <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">
+                    Textured Crop Fade
+                  </h3>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
+                    <span>Estimasi Pengerjaan:</span>
+                    <span className="font-semibold text-foreground">35 Menit</span>
+                  </div>
                 </div>
                 <Link
                   href="/dashboard/ai-consultant"
