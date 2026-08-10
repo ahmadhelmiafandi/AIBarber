@@ -8,22 +8,39 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SearchInput } from "@/components/ui/search-input"
 import { Pagination } from "@/components/ui/pagination"
-import { useAdminServices } from "@/hooks/use-admin"
+import {
+  useAdminServices,
+  useCreateServiceMutation,
+  useUpdateServiceMutation,
+  useDeleteServiceMutation,
+} from "@/hooks/use-admin"
+import { Service } from "@/types/api"
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "@/components/ui/table"
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog"
-import { Plus, Pencil, Clock, Loader2 } from "lucide-react"
+import { Plus, Pencil, Clock, Loader2, Trash2 } from "lucide-react"
 
-const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`
+const formatRp = (n: number) => `Rp ${(n || 0).toLocaleString("id-ID")}`
 
 export default function ServicesPage() {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [dialogOpen, setDialogOpen] = useState(false)
+
+  // Dialog States
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [selectedService, setSelectedService] = useState<Service | null>(null)
+
+  // Form State
+  const [name, setName] = useState("")
+  const [price, setPrice] = useState<number | "">(85000)
+  const [duration, setDuration] = useState<number | "">(30)
+  const [description, setDescription] = useState("")
 
   const { data: res, isLoading } = useAdminServices({
     page,
@@ -31,8 +48,67 @@ export default function ServicesPage() {
     search,
   })
 
+  const createMutation = useCreateServiceMutation()
+  const updateMutation = useUpdateServiceMutation()
+  const deleteMutation = useDeleteServiceMutation()
+
   const services = res?.data || []
   const meta = res?.meta || { current_page: 1, last_page: 1, total: 0, per_page: 10 }
+
+  const openCreateModal = () => {
+    setName("")
+    setPrice(85000)
+    setDuration(30)
+    setDescription("")
+    setCreateDialogOpen(true)
+  }
+
+  const openEditModal = (s: Service) => {
+    setSelectedService(s)
+    setName(s.name || "")
+    setPrice(s.price || 0)
+    setDuration(s.estimated_duration_minutes || 30)
+    setDescription(s.description || "")
+    setEditDialogOpen(true)
+  }
+
+  const openDeleteModal = (s: Service) => {
+    setSelectedService(s)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleCreate = async () => {
+    if (!name || !price || !duration) return
+    await createMutation.mutateAsync({
+      name,
+      price: Number(price),
+      estimated_duration_minutes: Number(duration),
+      description,
+    })
+    setCreateDialogOpen(false)
+  }
+
+  const handleUpdate = async () => {
+    if (!selectedService || !name || !price || !duration) return
+    await updateMutation.mutateAsync({
+      id: selectedService.id,
+      payload: {
+        name,
+        price: Number(price),
+        estimated_duration_minutes: Number(duration),
+        description,
+      },
+    })
+    setEditDialogOpen(false)
+    setSelectedService(null)
+  }
+
+  const handleDelete = async () => {
+    if (!selectedService) return
+    await deleteMutation.mutateAsync(selectedService.id)
+    setDeleteDialogOpen(false)
+    setSelectedService(null)
+  }
 
   return (
     <div className="space-y-6">
@@ -41,7 +117,7 @@ export default function ServicesPage() {
           <h1 className="text-2xl font-bold tracking-tight">Services</h1>
           <p className="text-sm text-muted-foreground">Kelola layanan barbershop dan estimasi durasi</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={openCreateModal}>
           <Plus className="mr-2 h-4 w-4" />Tambah Layanan
         </Button>
       </div>
@@ -61,7 +137,7 @@ export default function ServicesPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center p-12">
-              <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           ) : (
             <>
@@ -103,7 +179,26 @@ export default function ServicesPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><Pencil className="h-3.5 w-3.5" /></Button>
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                              title="Edit Layanan"
+                              onClick={() => openEditModal(s)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              title="Hapus Layanan"
+                              onClick={() => openDeleteModal(s)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
@@ -130,32 +225,99 @@ export default function ServicesPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {/* Create Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Tambah Layanan</DialogTitle>
+            <DialogTitle>Tambah Layanan Baru</DialogTitle>
             <DialogDescription>Estimasi durasi digunakan oleh Queue Engine untuk perhitungan antrian</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label>Nama Layanan</Label>
-              <Input placeholder="Nama layanan" />
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama layanan" />
             </div>
             <div className="grid gap-2">
               <Label>Harga (Rp)</Label>
-              <Input type="number" placeholder="85000" />
+              <Input type="number" value={price} onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")} placeholder="85000" />
             </div>
             <div className="grid gap-2">
               <Label className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4 text-primary" />
                 Estimasi Durasi (menit)
               </Label>
-              <Input type="number" placeholder="30" className="border-primary/50 text-lg font-mono" />
+              <Input type="number" value={duration} onChange={(e) => setDuration(e.target.value ? Number(e.target.value) : "")} placeholder="30" className="border-primary/50 text-lg font-mono" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Deskripsi (opsional)</Label>
+              <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Deskripsi ringkas layanan" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
-            <Button onClick={() => setDialogOpen(false)}>Simpan</Button>
+            <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>Batal</Button>
+            <Button onClick={handleCreate} disabled={createMutation.isPending}>
+              {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Simpan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Layanan</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Nama Layanan</Label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama layanan" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Harga (Rp)</Label>
+              <Input type="number" value={price} onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")} placeholder="85000" />
+            </div>
+            <div className="grid gap-2">
+              <Label className="flex items-center gap-1.5">
+                <Clock className="h-4 w-4 text-primary" />
+                Estimasi Durasi (menit)
+              </Label>
+              <Input type="number" value={duration} onChange={(e) => setDuration(e.target.value ? Number(e.target.value) : "")} placeholder="30" className="border-primary/50 text-lg font-mono" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Deskripsi (opsional)</Label>
+              <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Deskripsi ringkas layanan" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Batal</Button>
+            <Button onClick={handleUpdate} disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Perbarui
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <Trash2 className="h-5 w-5" />
+              Hapus Layanan
+            </DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus layanan <strong>{selectedService?.name}</strong>?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Batal</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
+              {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Hapus Layanan
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

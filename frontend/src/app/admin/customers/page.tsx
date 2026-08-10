@@ -9,14 +9,20 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectOption } from "@/components/ui/select"
 import { SearchInput } from "@/components/ui/search-input"
 import { Pagination } from "@/components/ui/pagination"
-import { useAdminCustomers, useCreateCustomerMutation } from "@/hooks/use-admin"
+import {
+  useAdminCustomers,
+  useCreateCustomerMutation,
+  useUpdateCustomerMutation,
+  useDeleteCustomerMutation,
+} from "@/hooks/use-admin"
+import { User } from "@/types/api"
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "@/components/ui/table"
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog"
-import { Plus, Pencil, UserX, Loader2 } from "lucide-react"
+import { Plus, Pencil, UserX, Loader2, Trash2 } from "lucide-react"
 
 const membershipColor = (m?: string) => {
   if (!m) return "outline" as const
@@ -32,12 +38,18 @@ export default function CustomersPage() {
   const [status, setStatus] = useState("")
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [dialogOpen, setDialogOpen] = useState(false)
 
-  // Form state
+  // Dialog States
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null)
+
+  // Form State
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
+  const [custStatus, setCustStatus] = useState("active")
 
   const { data, isLoading } = useAdminCustomers({
     page,
@@ -47,17 +59,55 @@ export default function CustomersPage() {
   })
 
   const createMutation = useCreateCustomerMutation()
+  const updateMutation = useUpdateCustomerMutation()
+  const deleteMutation = useDeleteCustomerMutation()
 
   const customers = data?.data || []
   const meta = data?.meta || { current_page: 1, last_page: 1, total: 0, per_page: 10 }
 
-  const handleCreate = async () => {
-    if (!name || !email) return
-    await createMutation.mutateAsync({ name, email, phone })
+  const openCreateModal = () => {
     setName("")
     setEmail("")
     setPhone("")
-    setDialogOpen(false)
+    setCustStatus("active")
+    setCreateDialogOpen(true)
+  }
+
+  const openEditModal = (c: User) => {
+    setSelectedCustomer(c)
+    setName(c.name || "")
+    setEmail(c.email || "")
+    setPhone(c.phone || "")
+    setCustStatus(c.status || "active")
+    setEditDialogOpen(true)
+  }
+
+  const openDeleteModal = (c: User) => {
+    setSelectedCustomer(c)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleCreate = async () => {
+    if (!name || !email) return
+    await createMutation.mutateAsync({ name, email, phone, status: custStatus })
+    setCreateDialogOpen(false)
+  }
+
+  const handleUpdate = async () => {
+    if (!selectedCustomer || !name || !email) return
+    await updateMutation.mutateAsync({
+      id: selectedCustomer.id,
+      payload: { name, email, phone, status: custStatus },
+    })
+    setEditDialogOpen(false)
+    setSelectedCustomer(null)
+  }
+
+  const handleDelete = async () => {
+    if (!selectedCustomer) return
+    await deleteMutation.mutateAsync(selectedCustomer.id)
+    setDeleteDialogOpen(false)
+    setSelectedCustomer(null)
   }
 
   return (
@@ -67,7 +117,7 @@ export default function CustomersPage() {
           <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
           <p className="text-sm text-muted-foreground">Kelola data pelanggan dan keanggotaan</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={openCreateModal}>
           <Plus className="mr-2 h-4 w-4" />Tambah Customer
         </Button>
       </div>
@@ -117,7 +167,7 @@ export default function CustomersPage() {
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-primary" />
                     Memuat data customer...
                   </TableCell>
                 </TableRow>
@@ -145,10 +195,22 @@ export default function CustomersPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          title="Edit Customer"
+                          onClick={() => openEditModal(c)}
+                        >
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Nonaktifkan">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          title="Hapus / Nonaktifkan"
+                          onClick={() => openDeleteModal(c)}
+                        >
                           <UserX className="h-3.5 w-3.5" />
                         </Button>
                       </div>
@@ -176,7 +238,8 @@ export default function CustomersPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {/* Create Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Tambah Customer Baru</DialogTitle>
@@ -194,12 +257,80 @@ export default function CustomersPage() {
               <Label>Email</Label>
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" />
             </div>
+            <div className="grid gap-2">
+              <Label>Status</Label>
+              <Select value={custStatus} onChange={(e) => setCustStatus(e.target.value)}>
+                <SelectOption value="active">Aktif</SelectOption>
+                <SelectOption value="inactive">Nonaktif</SelectOption>
+                <SelectOption value="suspended">Ditangguhkan</SelectOption>
+              </Select>
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
+            <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>Batal</Button>
             <Button onClick={handleCreate} disabled={createMutation.isPending}>
               {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Simpan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Data Customer</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Nama</Label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama lengkap" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Telepon</Label>
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="08xxxxxxxxxx" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Email</Label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Status</Label>
+              <Select value={custStatus} onChange={(e) => setCustStatus(e.target.value)}>
+                <SelectOption value="active">Aktif</SelectOption>
+                <SelectOption value="inactive">Nonaktif</SelectOption>
+                <SelectOption value="suspended">Ditangguhkan</SelectOption>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Batal</Button>
+            <Button onClick={handleUpdate} disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Perbarui
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <Trash2 className="h-5 w-5" />
+              Hapus Customer
+            </DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus data customer <strong>{selectedCustomer?.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Batal</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
+              {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Hapus Data
             </Button>
           </DialogFooter>
         </DialogContent>

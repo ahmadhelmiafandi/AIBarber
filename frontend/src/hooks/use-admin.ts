@@ -66,6 +66,32 @@ export function useCreateCustomerMutation() {
   });
 }
 
+export function useUpdateCustomerMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: string; payload: { name?: string; email?: string; phone?: string; status?: string } }) => {
+      const res = await apiClient.put<ApiResponse<User>>(`/admin/customers/${id}`, payload);
+      return res.data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-customers'] });
+    },
+  });
+}
+
+export function useDeleteCustomerMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete<ApiResponse<null>>(`/admin/customers/${id}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-customers'] });
+    },
+  });
+}
+
 // 2. Admin Bookings Hook
 export function useAdminBookings(params: FetchQueryParams = {}) {
   const { page = 1, perPage = 10, search = '', status = '', branchId = '', date = '' } = params;
@@ -151,6 +177,45 @@ export function useAdminServices(params: FetchQueryParams = {}) {
       };
     },
     placeholderData: keepPreviousData,
+  });
+}
+
+export function useCreateServiceMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { name: string; price: number; estimated_duration_minutes: number; description?: string; is_active?: boolean }) => {
+      const res = await apiClient.post<ApiResponse<Service>>('/services', payload);
+      return res.data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-services'] });
+    },
+  });
+}
+
+export function useUpdateServiceMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: string; payload: { name?: string; price?: number; estimated_duration_minutes?: number; description?: string; is_active?: boolean } }) => {
+      const res = await apiClient.put<ApiResponse<Service>>(`/services/${id}`, payload);
+      return res.data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-services'] });
+    },
+  });
+}
+
+export function useDeleteServiceMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete<ApiResponse<null>>(`/services/${id}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-services'] });
+    },
   });
 }
 
