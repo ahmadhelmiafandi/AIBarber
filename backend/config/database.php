@@ -3,6 +3,27 @@
 use Illuminate\Support\Str;
 
 $dbUrl = env('DB_URL') ?: env('DATABASE_URL');
+$hasPg = !empty(env('DB_HOST')) || !empty(env('PGHOST')) || !empty($dbUrl);
+$hasMysql = !empty(env('MYSQLHOST'));
+$defaultConn = env('DB_CONNECTION');
+
+if (empty($defaultConn)) {
+    if ($hasMysql) {
+        $defaultConn = 'mysql';
+    } elseif ($hasPg) {
+        $defaultConn = 'pgsql';
+    } else {
+        $defaultConn = 'sqlite';
+    }
+}
+
+if ($defaultConn === 'sqlite') {
+    $sqlitePath = env('DB_DATABASE') ?: database_path('database.sqlite');
+    if (!file_exists($sqlitePath) && str_contains($sqlitePath, '.sqlite')) {
+        @mkdir(dirname($sqlitePath), 0755, true);
+        @touch($sqlitePath);
+    }
+}
 
 return [
 
@@ -12,7 +33,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'default' => env('DB_CONNECTION', 'pgsql'),
+    'default' => $defaultConn,
 
     /*
     |--------------------------------------------------------------------------
